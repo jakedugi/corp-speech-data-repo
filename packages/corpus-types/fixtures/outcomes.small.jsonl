@@ -1,0 +1,3 @@
+{"schema_version": "1.0", "case_id": "case_001", "label": "loss", "label_source": "manual", "date": "2023-06-15", "meta": {"court": "scotus", "docket": "22-123", "judge": "Justice Roberts"}}
+{"schema_version": "1.0", "case_id": "case_002", "label": "win", "label_source": "manual", "date": "2023-06-20", "meta": {"court": "scotus", "docket": "22-456", "judge": "Chief Justice Roberts"}}
+{"schema_version": "1.0", "case_id": "case_003", "label": "win", "label_source": "manual", "date": "2023-06-25", "meta": {"court": "scotus", "docket": "22-789", "judge": "Justice Kagan"}}

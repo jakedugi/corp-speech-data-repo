@@ -1,0 +1,30 @@
+{
+  "generated_at": "2025-09-09T22:08:23.150182Z",
+  "data_directory": "corpus_types/fixtures",
+  "versions": {
+    "corpus-types": "unknown",
+    "corpus-api": "unknown",
+    "corpus-cleaner": "unknown",
+    "corpus-extractors": "unknown",
+    "python": "3.13.3"
+  },
+  "artifacts": [
+    "docs.raw.jsonl",
+    "docs.norm.jsonl",
+    "quotes.jsonl",
+    "outcomes.jsonl"
+  ],
+  "counts": {
+    "docs.raw.jsonl": 3,
+    "docs.norm.jsonl": 0,
+    "quotes.jsonl": 3,
+    "outcomes.jsonl": 3
+  },
+  "fingerprints": {
+    "docs.raw.jsonl": "d8cf40000c9373f2b1f2d60b50f34d74",
+    "docs.norm.jsonl": "file_missing",
+    "quotes.jsonl": "80c7990eac6cc7ec2bd7147f6d5b3c20",
+    "outcomes.jsonl": "56a0cc73b411970fd2b3bad8560115c7"
+  },
+  "status": "success"
+}

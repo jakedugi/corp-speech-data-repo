@@ -37,7 +37,7 @@ def main():
         "scripts/write_run_log.py",
         "scripts/validate_pipeline.py",
         "configs/query.small.yaml",
-        "corpus_types/utils/deterministic_ids.py",
+        "packages/corpus-types/src/corpus_types/utils/deterministic_ids.py",
         "tests/test_data_pipeline_validation.py",
         "PIPELINE_STATUS.md"
     ]
@@ -49,7 +49,7 @@ def main():
         print(f"  {status} {file_path}")
 
     # Check fixtures
-    fixtures_dir = pathlib.Path("corpus_types/fixtures")
+    fixtures_dir = pathlib.Path("fixtures")
     fixture_files = [
         "docs.raw.small.jsonl",
         "quotes.small.jsonl",

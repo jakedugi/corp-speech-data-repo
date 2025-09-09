@@ -1,0 +1,617 @@
+# =============================================================================
+# COMPREHENSIVE GITIGNORE FOR CORPORATE SPEECH DATA REPOSITORY
+# =============================================================================
+# This .gitignore is designed for Python data science/ML projects with:
+# - Machine Learning (PyTorch, Transformers, SpaCy)
+# - Data Science (Pandas, NumPy, Jupyter)
+# - Web Scraping (Playwright, BeautifulSoup)
+# - API Clients (HTTPX, Requests)
+# - Text Processing (NLTK, Sentence Transformers)
+# =============================================================================
+
+# =============================================================================
+# PYTHON - Core Python
+# =============================================================================
+
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# C extensions
+*.so
+
+# Distribution / packaging
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+pip-wheel-metadata/
+share/python-wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+
+# PyInstaller
+*.manifest
+*.spec
+
+# Installer logs
+pip-log.txt
+pip-delete-this-directory.txt
+
+# Unit test / coverage reports
+htmlcov/
+.tox/
+.nox/
+.coverage
+.coverage.*
+.cache
+nosetests.xml
+coverage.xml
+*.cover
+*.py,cover
+.hypothesis/
+.pytest_cache/
+pytest.ini
+
+# Translations
+*.mo
+*.pot
+
+# Django stuff:
+*.log
+local_settings.py
+db.sqlite3
+db.sqlite3-journal
+
+# Flask stuff:
+instance/
+.webassets-cache
+
+# Scrapy stuff:
+.scrapy
+
+# Sphinx documentation
+docs/_build/
+
+# PyBuilder
+target/
+
+# Jupyter Notebook
+.ipynb_checkpoints
+
+# IPython
+profile_default/
+ipython_config.py
+
+# pyenv
+.python-version
+
+# pipenv
+Pipfile.lock
+
+# PEP 582; used by e.g. github.com/David-OConnor/pyflow
+__pypackages__/
+
+# Celery stuff
+celerybeat-schedule
+celerybeat.pid
+
+# SageMath parsed files
+*.sage.py
+
+# Environments
+.env
+.venv
+env/
+venv/
+ENV/
+env.bak/
+venv.bak/
+.Python
+env/
+venv/
+ENV/
+env.bak/
+venv.bak/
+
+# Spyder project settings
+.spyderproject
+.spyproject
+
+# Rope project settings
+.ropeproject
+
+# mkdocs documentation
+/site
+
+# mypy
+.mypy_cache/
+.dmypy.json
+dmypy.json
+
+# Pyre type checker
+.pyre/
+
+# =============================================================================
+# DATA SCIENCE & MACHINE LEARNING
+# =============================================================================
+
+# Data files (uncomment as needed)
+# *.csv
+# *.json
+# *.jsonl
+# *.parquet
+# *.feather
+# *.pkl
+# *.pickle
+# *.h5
+# *.hdf5
+# *.npy
+# *.npz
+
+# Model files
+*.pth
+*.pt
+*.bin
+*.h5
+*.hdf5
+*.pb
+*.onnx
+*.tflite
+*.joblib
+*.pkl
+*.pickle
+*.model
+*.weights
+*.ckpt
+*.checkpoint
+
+# TensorBoard
+runs/
+logs/
+tensorboard/
+
+# MLflow
+mlruns/
+mlartifacts/
+
+# Weights & Biases
+wandb/
+
+# DVC
+.dvc/
+.dvc/cache/
+.dvc/tmp/
+.dvc/plots/
+
+# Kedro
+.data/
+.conf/
+
+# Jupyter
+.ipynb_checkpoints/
+*.ipynb
+
+# Kaggle
+kaggle.json
+
+# =============================================================================
+# WEB SCRAPING & BROWSERS
+# =============================================================================
+
+# Playwright
+test-results/
+playwright-report/
+playwright/.cache/
+
+# Selenium
+geckodriver.log
+chromedriver.log
+
+# Scrapy
+.scrapy/
+
+# BeautifulSoup cache
+*.soup
+*.bs4
+
+# =============================================================================
+# DATABASES
+# =============================================================================
+
+# SQLite
+*.db
+*.sqlite
+*.sqlite3
+*.db-journal
+
+# PostgreSQL
+*.pg
+
+# DuckDB
+*.duckdb
+*.duckdb.wal
+
+# Polars
+*.ipc
+*.arrow
+
+# Parquet
+*.parquet
+
+# Pickle files (data dumps)
+*.pkl
+*.pickle
+*.joblib
+
+# HDF5
+*.h5
+*.hdf5
+
+# =============================================================================
+# DEVELOPMENT TOOLS & IDEs
+# =============================================================================
+
+# PyCharm
+.idea/
+*.iml
+*.ipr
+*.iws
+
+# VS Code
+.vscode/
+*.code-workspace
+
+# Sublime Text
+*.sublime-project
+*.sublime-workspace
+
+# Vim
+*.swp
+*.swo
+*~
+
+# Emacs
+*~
+\#*\#
+/.emacs.desktop
+/.emacs.desktop.lock
+*.elc
+auto-save-list
+tramp
+.\#*
+
+# Atom
+.atom/
+
+# Xcode
+*.pbxuser
+!default.pbxuser
+*.mode1v3
+!default.mode1v3
+*.mode2v3
+!default.mode2v3
+*.perspectivev3
+!default.perspectivev3
+xcuserdata/
+
+# Android Studio
+.idea/
+.gradle/
+local.properties
+
+# Eclipse
+.metadata
+bin/
+tmp/
+*.tmp
+*.bak
+*.swp
+*~.nib
+local.properties
+.settings/
+.loadpath
+.recommenders
+
+# NetBeans
+nbproject/private/
+nbbuild/
+dist/
+nbdist/
+.nb-gradle/
+
+# Intellij
+.idea/
+*.iws
+*.iml
+*.ipr
+
+# =============================================================================
+# OPERATING SYSTEMS
+# =============================================================================
+
+# macOS
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Windows
+Thumbs.db
+Thumbs.db:encryptable
+ehthumbs.db
+ehthumbs_vista.db
+*.stackdump
+[Dd]esktop.ini
+$RECYCLE.BIN/
+*.cab
+*.msi
+*.msix
+*.msm
+*.msp
+*.lnk
+
+# Linux
+*~
+.fuse_hidden*
+.directory
+.Trash-*
+.nfs*
+
+# =============================================================================
+# BUILD & DEPLOYMENT
+# =============================================================================
+
+# Docker
+.dockerignore
+Dockerfile*
+docker-compose*.yml
+.docker/
+
+# Kubernetes
+*.yaml
+*.yml
+k8s/
+
+# Terraform
+*.tfstate
+*.tfvars
+.terraform/
+
+# Ansible
+*.retry
+
+# =============================================================================
+# LOGS & DEBUGGING
+# =============================================================================
+
+# General logs
+*.log
+logs/
+log/
+
+# Application logs
+*.log.*
+app.log
+error.log
+access.log
+debug.log
+
+# System logs
+syslog
+kern.log
+auth.log
+
+# Web server logs
+access.log
+error.log
+
+# Database logs
+mysql.log
+postgresql.log
+
+# =============================================================================
+# SECRETS & SENSITIVE DATA
+# =============================================================================
+
+# API Keys & Secrets
+.env
+.env.local
+.env.production
+.env.staging
+.env.development
+.env.test
+
+# AWS
+.aws/
+credentials
+config
+
+# Google Cloud
+gcp-key.json
+*.p12
+*.pem
+
+# Azure
+.azure/
+
+# SSH keys (if accidentally committed)
+id_rsa
+id_rsa.pub
+known_hosts
+
+# Private keys
+*.key
+*.pem
+*.crt
+*.cer
+*.p12
+*.pfx
+
+# Password files
+passwords.txt
+secrets.txt
+
+# =============================================================================
+# CACHE & TEMPORARY FILES
+# =============================================================================
+
+# Python cache
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+*.so
+
+# Package caches
+.pip/
+.cache/
+.pytest_cache/
+.mypy_cache/
+.dmypy_cache/
+.coverage/
+htmlcov/
+
+# Node.js (if any)
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# OS temp files
+*.tmp
+*.temp
+*.swp
+*.swo
+*~
+
+# =============================================================================
+# TESTING & CI/CD
+# =============================================================================
+
+# Test results
+test-results/
+playwright-report/
+coverage/
+htmlcov/
+.coverage
+*.cover
+
+# CI/CD
+.github/workflows/*.log
+.github/actions/*/dist/
+
+# Build artifacts
+dist/
+build/
+*.egg-info/
+
+# =============================================================================
+# DOCUMENTATION
+# =============================================================================
+
+# Sphinx
+docs/_build/
+docs/build/
+
+# MkDocs
+site/
+
+# LaTeX
+*.aux
+*.log
+*.synctex.gz
+*.toc
+*.out
+*.fls
+*.fdb_latexmk
+*.blg
+*.bbl
+
+# =============================================================================
+# BACKUP FILES
+# =============================================================================
+
+# General backups
+*.bak
+*.backup
+*.old
+*.orig
+*.swp
+*.swo
+
+# Vim
+*.un~
+Session.vim
+
+# Emacs
+*~
+\#*\#
+/.emacs.desktop
+/.emacs.desktop.lock
+
+# =============================================================================
+# PROJECT SPECIFIC
+# =============================================================================
+
+# Data directories (uncomment as needed)
+# data/
+# raw_data/
+# processed_data/
+# models/
+# artifacts/
+
+# Legal document specific
+# *.pdf
+# *.doc
+# *.docx
+# *.txt
+
+# API responses
+# api_responses/
+# cache/
+
+# Temporary processing files
+# temp/
+# tmp/
+# staging/
+
+# =============================================================================
+# CURSOR AI EDITOR
+# =============================================================================
+
+# Cursor AI Editor
+.cursor/
+.cursorignore
+.cursorindexingignore
+
+# =============================================================================
+# PROJECT-SPECIFIC IGNORES
+# =============================================================================
+
+# Exclude CourtListener chunks
+data/raw/courtlistener/**/chunk_*/
+
+# Custom project ignores
+src/corp_speech_risk_dataset/disso_prompt/
+
+# Keep structure for empty folders
+!logs/.gitkeep
+!data/raw/.gitkeep
+!data/processed/.gitkeep
