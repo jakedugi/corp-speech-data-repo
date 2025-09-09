@@ -436,6 +436,7 @@ postgresql.log
 .env.staging
 .env.development
 .env.test
+!.env.sample
 
 # AWS
 .aws/

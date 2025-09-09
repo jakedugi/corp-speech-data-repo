@@ -1,38 +1,38 @@
 # Changelog
 
-All notable changes to corpus-api will be documented in this file.
+All notable changes to corpus-hydrator will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [1.0.0] - 2024-01-15
+## [1.0.0] - 2024-01-XX
 
 ### Added
-- Initial release of corpus-api module
-- CourtListener API client with full search and retrieval capabilities
-- RSS feed client for SEC, FTC, and DOJ news sources
-- Wikipedia scraper for legal case lists and corporate law content
-- Unified CLI interface for all data sources
-- Comprehensive configuration system with YAML files
-- Rate limiting and retry logic for all APIs
-- Pydantic models for data validation
-- Extensive test suite with fixtures
-- Documentation and examples
+- Initial release of corpus-hydrator package
+- CourtListener API client with rate limiting
+- RSS feed parsing and article extraction
+- Web scraping capabilities with Playwright
+- Offline fixture support for testing
+- CLI interface for data collection
 
 ### Features
-- CourtListener opinion search and retrieval
-- RSS feed parsing and article extraction
-- Wikipedia page scraping with section targeting
-- JSONL output format for all sources
-- Metadata extraction and standardization
-- Error handling and recovery
-- Logging with Loguru
+- **API Integration**: CourtListener REST API v4 support
+- **Feed Processing**: SEC, FTC, DOJ RSS feed parsing
+- **Web Scraping**: Wikipedia and legal document scraping
+- **Rate Limiting**: Built-in request throttling and retry logic
+- **Provenance Tracking**: Request/response metadata capture
+- **Fixture Support**: Offline testing with pre-recorded data
 
-## [0.1.0] - 2024-01-01
+### Technical
+- Python 3.10+ support
+- HTTPX for async HTTP requests
+- Playwright for browser automation
+- Feedparser for RSS processing
+- BeautifulSoup4 for HTML parsing
+
+## [0.1.0] - 2024-01-XX
 
 ### Added
-- Basic CourtListener API client
-- RSS feed parsing functionality
-- Initial CLI interface
-- Basic test framework
-- Configuration file structure
+- Basic API client structure
+- Initial RSS feed support
+- Development setup and testing framework

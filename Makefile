@@ -1,65 +1,89 @@
-DATA_DIR ?= data
-QUERY    ?= configs/query.small.yaml
+PY ?= python
+RUN_ID ?= $(shell date -u +%Y%m%dT%H%M%SZ)
+OUT ?= outputs/$(RUN_ID)
+QUERY ?= configs/query.small.yaml
 
-.PHONY: demo_e2e clean fetch normalize extract validate manifest help
+# Create outputs directory and symlink
+$(OUT):
+	mkdir -p $(OUT)
+	ln -sf $(RUN_ID) outputs/latest 2>/dev/null || true
+
+.PHONY: demo_e2e clean fetch normalize extract validate manifest help status fmt lint test ci
 
 help:
 	@echo "Data Pipeline Orchestrator"
 	@echo ""
 	@echo "Commands:"
 	@echo "  demo_e2e    - Run full pipeline: clean → fetch → normalize → extract → validate → manifest"
-	@echo "  clean       - Remove data directory and recreate"
+	@echo "  clean       - Remove output directory and recreate"
 	@echo "  fetch       - Fetch raw documents using hydrator"
 	@echo "  normalize   - Normalize documents using cleaner"
 	@echo "  extract     - Extract quotes and outcomes using extractors"
 	@echo "  validate    - Validate all outputs against schemas"
 	@echo "  manifest    - Generate manifest with versions and fingerprints"
+	@echo "  status      - Show current pipeline status"
 	@echo ""
 	@echo "Configuration:"
-	@echo "  DATA_DIR=$(DATA_DIR)"
+	@echo "  RUN_ID=$(RUN_ID)"
+	@echo "  OUT=$(OUT)"
 	@echo "  QUERY=$(QUERY)"
 
-demo_e2e: clean fetch normalize extract validate manifest
+demo_e2e: $(OUT) clean fetch normalize extract validate manifest
 	@echo "✅ Data pipeline complete!"
-	@echo "📊 Check $(DATA_DIR)/manifest.json for results"
+	@echo "📊 Check $(OUT)/manifest.json for results"
+	@echo "🔗 Latest run: outputs/latest"
 
 clean:
-	@echo "🧹 Cleaning data directory..."
-	rm -rf $(DATA_DIR)
-	mkdir -p $(DATA_DIR)
-	@echo "📁 Created $(DATA_DIR)/"
+	@echo "🧹 Cleaning outputs directory..."
+	rm -rf $(OUT) && mkdir -p $(OUT)
 
 fetch:
 	@echo "📥 Fetching raw documents..."
-	@if [ -f "corpus_types/fixtures/docs.raw.small.jsonl" ]; then \
-		corpus-fetch courtlistener --query $(QUERY) --use-fixture corpus_types/fixtures/docs.raw.small.jsonl --output $(DATA_DIR)/docs.raw.jsonl; \
+	@if [ -f "fixtures/docs.raw.small.jsonl" ]; then \
+		hydrator fetch --query $(QUERY) --out $(OUT)/docs.raw.jsonl --use-fixture fixtures/docs.raw.small.jsonl; \
 	else \
-		corpus-fetch courtlistener --query $(QUERY) --output $(DATA_DIR)/docs.raw.jsonl; \
+		hydrator fetch --query $(QUERY) --out $(OUT)/docs.raw.jsonl; \
 	fi
-	@echo "✅ Fetched documents to $(DATA_DIR)/docs.raw.jsonl"
+	@echo "✅ Fetched documents to $(OUT)/docs.raw.jsonl"
 
 normalize:
 	@echo "🧽 Normalizing documents..."
-	corpus-clean normalize --input $(DATA_DIR)/docs.raw.jsonl --output $(DATA_DIR)/docs.norm.jsonl
-	@echo "✅ Normalized documents to $(DATA_DIR)/docs.norm.jsonl"
+	cleaner normalize --in $(OUT)/docs.raw.jsonl --out $(OUT)/docs.norm.jsonl --keep-offset-map
+	@echo "✅ Normalized documents to $(OUT)/docs.norm.jsonl"
 
 extract:
 	@echo "🔍 Extracting quotes and outcomes..."
-	corpus-extract-quotes --input $(DATA_DIR)/docs.norm.jsonl --output $(DATA_DIR)/quotes.jsonl
-	corpus-extract-outcomes --input $(DATA_DIR)/docs.norm.jsonl --output $(DATA_DIR)/outcomes.jsonl
-	@echo "✅ Extracted quotes to $(DATA_DIR)/quotes.jsonl"
-	@echo "✅ Extracted outcomes to $(DATA_DIR)/outcomes.jsonl"
+	extract quotes   --in $(OUT)/docs.norm.jsonl --out $(OUT)/quotes.jsonl
+	extract outcomes --in $(OUT)/docs.norm.jsonl --out $(OUT)/outcomes.jsonl
+	@echo "✅ Extracted quotes to $(OUT)/quotes.jsonl"
+	@echo "✅ Extracted outcomes to $(OUT)/outcomes.jsonl"
 
 validate:
 	@echo "✅ Validating outputs..."
-	corpus-validate jsonl Doc $(DATA_DIR)/docs.norm.jsonl
-	corpus-validate jsonl Quote $(DATA_DIR)/quotes.jsonl
-	corpus-validate jsonl Outcome $(DATA_DIR)/outcomes.jsonl
+	corpus-validate jsonl Doc     $(OUT)/docs.norm.jsonl
+	corpus-validate jsonl Quote   $(OUT)/quotes.jsonl
+	corpus-validate jsonl Outcome $(OUT)/outcomes.jsonl
 	@echo "✅ All validations passed!"
 
 manifest:
 	@echo "📋 Generating manifest..."
-	python scripts/write_manifest.py $(DATA_DIR)
-	python scripts/write_run_log.py $(DATA_DIR) demo_e2e
-	@echo "✅ Manifest written to $(DATA_DIR)/manifest.json"
-	@echo "✅ Run log written to $(DATA_DIR)/RUN.md"
+	$(PY) scripts/write_manifest.py $(OUT)
+	@echo "✅ Manifest written to $(OUT)/manifest.json"
+
+status:
+	@echo "📊 Pipeline Status:"
+	@echo "  RUN_ID: $(RUN_ID)"
+	@echo "  OUTPUT: $(OUT)"
+	@echo "  LATEST: outputs/latest"
+	@if [ -d "$(OUT)" ]; then \
+		echo "  Files: $$(ls -1 $(OUT) 2>/dev/null | wc -l) artifacts"; \
+		echo "  Size: $$(du -sh $(OUT) 2>/dev/null || echo 'N/A')"; \
+	fi
+	@if [ -L "outputs/latest" ]; then \
+		echo "  Latest points to: $$(readlink outputs/latest)"; \
+	fi
+
+fmt:      ruff format .
+lint:     ruff check . && mypy packages
+test:     pytest -q
+ci:       make lint && make test && make demo_e2e
