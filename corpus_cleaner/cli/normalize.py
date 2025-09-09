@@ -69,6 +69,9 @@ def normalize(
                 original_text
             )
 
+            # TODO: For now, we don't save offset mappings as they're not fully implemented
+            # In the future, this would save offset mappings to offset_file
+
             # Update document
             normalized_doc = doc.copy()
             normalized_doc["raw_text"] = cleaned_text

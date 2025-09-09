@@ -1,5 +1,6 @@
 import re
 import unicodedata
+from typing import Dict, List, Tuple
 
 
 class TextCleaner:
@@ -45,3 +46,18 @@ class TextCleaner:
         # Final whitespace normalization: collapse any run of spaces/tabs into a single space
         text = re.sub(r"[ \t]{2,}", " ", text)
         return text
+
+    def normalize_text_with_offsets(self, text: str) -> Tuple[str, List[Tuple[int, int]]]:
+        """
+        Normalize text and return character offset mappings.
+
+        Returns:
+            Tuple of (normalized_text, offset_map)
+            where offset_map is [(orig_start, orig_end, norm_start, norm_end), ...]
+        """
+        # For now, return identity mapping - full implementation would track
+        # character positions through each normalization step
+        normalized = self.clean(text)
+        # Simple identity mapping - in practice this would track each transformation
+        offset_map = [(i, i, i, i) for i in range(len(normalized))]
+        return normalized, offset_map

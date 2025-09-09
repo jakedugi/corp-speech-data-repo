@@ -4,7 +4,7 @@ import pytest
 from datetime import datetime
 from pydantic import ValidationError
 
-from corp_speech_risk_dataset.types.schemas.models import (
+from corpus_types.schemas.models import (
     RequestProv,
     ResponseProv,
     AdapterProv,

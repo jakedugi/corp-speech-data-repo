@@ -12,7 +12,7 @@ from pathlib import Path
 # Add the main project src to path
 sys.path.insert(0, str(Path(__file__).parent.parent.parent / "src"))
 
-from corp_speech_risk_dataset.types.schemas.models import (
+from corpus_types.schemas.models import (
     Doc,
     Quote,
     Outcome,

@@ -8,7 +8,7 @@ from typing import Any, Dict, List, Optional
 import httpx
 from loguru import logger
 
-from corp_speech_risk_dataset.types.schemas.models import APIConfig
+from corpus_types.schemas.models import APIConfig
 from .rss_core import RSSCore
 
 

@@ -1,7 +1,7 @@
 """Tests for the TextCleaner functionality."""
 
 import pytest
-from corp_speech_risk_dataset.cleaner import TextCleaner
+from corpus_cleaner.cleaner import TextCleaner
 
 
 class TestTextCleaner:

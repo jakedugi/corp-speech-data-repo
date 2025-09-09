@@ -18,7 +18,7 @@ import os
 import httpx
 from loguru import logger
 
-from corp_speech_risk_dataset.types.schemas.models import APIConfig
+from corpus_types.schemas.models import APIConfig
 from corp_speech_risk_dataset.api.adapters.courtlistener.queries import STATUTE_QUERIES
 from .courtlistener_client import CourtListenerClient
 

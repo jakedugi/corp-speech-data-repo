@@ -15,12 +15,13 @@ import random
 from asyncio import Semaphore
 from httpx import AsyncClient, Limits, AsyncHTTPTransport
 
-from corp_speech_risk_dataset.api.client.base_api_client import BaseAPIClient
-from corp_speech_risk_dataset.types.schemas.models import APIConfig
-from corp_speech_risk_dataset.infrastructure.http_utils import (
-    safe_sync_get,
-    safe_async_get,
-)
+from corpus_api.client.base_api_client import BaseAPIClient
+from corpus_types.schemas.models import APIConfig
+# TODO: Implement http_utils or use requests directly
+# from corpus_api.infrastructure.http_utils import (
+#     safe_sync_get,
+#     safe_async_get,
+# )
 
 # API endpoint configurations
 API_ENDPOINTS = {

@@ -1,0 +1,13 @@
+sources:
+  - courtlistener
+
+courtlistener:
+  date_range:
+    start: "2023-01-01"
+    end: "2023-06-30"
+  courts: ["scotus"]
+  keywords: ["corporation", "securities"]
+  max_results: 5  # Small number for testing
+
+# For offline mode, use fixtures instead of API calls
+offline: true

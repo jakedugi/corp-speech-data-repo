@@ -1,7 +1,7 @@
 import pytest
 from pathlib import Path
 from corp_speech_risk_dataset.api.adapters.courtlistener.queries import build_queries
-from corp_speech_risk_dataset.api.orchestrators.courtlistener_orchestrator import (
+from corpus_api.orchestrators.courtlistener_orchestrator import (
     CourtListenerOrchestrator,
 )
 

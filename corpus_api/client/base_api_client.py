@@ -1,7 +1,7 @@
 """Base API client for making HTTP requests."""
 
 from typing import Any, Dict, Optional
-from corp_speech_risk_dataset.types.schemas.models import APIConfig
+from corpus_types.schemas.models import APIConfig
 
 
 class BaseAPIClient:

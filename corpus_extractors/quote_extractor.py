@@ -8,12 +8,11 @@ from pathlib import Path
 from typing import Iterator, List, Optional, Set
 from loguru import logger
 
-from ..domain.ports import QuoteExtractor as QuoteExtractorPort
-from ..types.schemas.models import QuoteCandidate
+from corpus_types.schemas.models import QuoteCandidate
 from .first_pass import FirstPassExtractor
 from .attribution import Attributor
 from .rerank import SemanticReranker
-from ..cleaner import TextCleaner
+from corpus_cleaner.cleaner import TextCleaner
 
 
 class QuoteExtractor(QuoteExtractorPort):

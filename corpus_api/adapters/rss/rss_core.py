@@ -3,7 +3,7 @@
 from __future__ import annotations
 import feedparser
 from typing import Any, Dict, List
-from corp_speech_risk_dataset.api.config.rss_config import RSS_FEEDS
+from corpus_api.config.rss_config import RSS_FEEDS
 
 
 class RSSCore:

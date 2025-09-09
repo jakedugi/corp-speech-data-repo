@@ -4,7 +4,7 @@ from corp_speech_risk_dataset.corpus_extractors import (
     FirstPassExtractor,
     SemanticReranker,
 )
-from corp_speech_risk_dataset.cleaner import TextCleaner
+from corpus_cleaner.cleaner import TextCleaner
 
 
 def test_first_pass_hits_bullet():

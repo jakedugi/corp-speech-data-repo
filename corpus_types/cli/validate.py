@@ -12,7 +12,7 @@ from pathlib import Path
 from typing import Optional, Type
 import orjson
 
-from corp_speech_risk_dataset.types.schemas.models import (
+from corpus_types.schemas.models import (
     Doc,
     Quote,
     Outcome,

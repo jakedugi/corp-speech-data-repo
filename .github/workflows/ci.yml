@@ -96,6 +96,47 @@ jobs:
     - name: Test configuration loading
       run: uv run python -c "from corpus_api.configs.query import load_query_config; print('Config loading works')"
 
+    - name: Test data pipeline validation
+      run: |
+        # Test deterministic ID generation
+        uv run python3 -c "
+        from corpus_types.utils.deterministic_ids import generate_quote_id, validate_id_uniqueness
+        id1 = generate_quote_id('test_doc', 10, 20, 'test quote')
+        id2 = generate_quote_id('test_doc', 10, 20, 'test quote')
+        assert id1 == id2, f'IDs not deterministic: {id1} != {id2}'
+        print('✅ Deterministic ID generation works')
+        "
+
+    - name: Test fixture data integrity
+      run: |
+        uv run python3 -c "
+        import json, pathlib
+        fixtures_dir = pathlib.Path('corpus_types/fixtures')
+        docs_file = fixtures_dir / 'docs.raw.small.jsonl'
+        quotes_file = fixtures_dir / 'quotes.small.jsonl'
+
+        # Count docs
+        with docs_file.open('r') as f:
+            docs = [json.loads(line) for line in f if line.strip()]
+        print(f'Found {len(docs)} documents in fixture')
+
+        # Count quotes
+        with quotes_file.open('r') as f:
+            quotes = [json.loads(line) for line in f if line.strip()]
+        print(f'Found {len(quotes)} quotes in fixture')
+
+        # Validate ID references
+        doc_ids = {doc['doc_id'] for doc in docs}
+        for quote in quotes:
+            assert quote['doc_id'] in doc_ids, f'Quote references missing doc_id: {quote[\"doc_id\"]}'
+        print('✅ Fixture data integrity validated')
+        "
+
+    - name: Test manifest generation
+      run: |
+        uv run python3 scripts/write_manifest.py corpus_types/fixtures
+        echo 'Manifest generated successfully'
+
   docs:
     runs-on: ubuntu-latest
 

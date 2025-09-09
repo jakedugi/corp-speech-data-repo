@@ -10,7 +10,7 @@ from pathlib import Path
 from typing import Type, Dict, Any, Optional
 from pydantic import BaseModel
 
-from corp_speech_risk_dataset.types.schemas.models import (
+from corpus_types.schemas.models import (
     Doc,
     Quote,
     Outcome,

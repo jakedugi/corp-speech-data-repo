@@ -1,6 +1,6 @@
 import pytest
 from corp_speech_risk_dataset.corpus_extractors import FirstPassExtractor
-from corp_speech_risk_dataset.cleaner import TextCleaner
+from corpus_cleaner.cleaner import TextCleaner
 
 # A minimal snippet of the exhibit text containing the "smoking-gun" quotes we must always capture.
 GOLDEN_DOC = """

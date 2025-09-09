@@ -30,6 +30,9 @@ def courtlistener(
     output_file: Path = typer.Option(
         ..., "--output", help="Output JSONL file for documents"
     ),
+    fixture_file: Optional[Path] = typer.Option(
+        None, "--use-fixture", help="Use fixture file instead of API calls"
+    ),
     config_file: Optional[Path] = typer.Option(
         None, "--config", help="API configuration file"
     ),
@@ -41,9 +44,27 @@ def courtlistener(
 ):
     """
     Fetch documents from CourtListener API based on query configuration.
+    Use --use-fixture for offline testing.
     """
     logger.info(f"Fetching documents from CourtListener using query: {query_file}")
     logger.info(f"Output: {output_file}")
+
+    # Check if using fixture mode
+    if fixture_file:
+        logger.info(f"Using fixture file: {fixture_file}")
+        if not fixture_file.exists():
+            raise FileNotFoundError(f"Fixture file not found: {fixture_file}")
+
+        # Copy fixture to output (simulating fetch)
+        import shutil
+        shutil.copy2(fixture_file, output_file)
+
+        # Count documents
+        with open(output_file, "r") as f:
+            doc_count = sum(1 for _ in f)
+
+        logger.info(f"Successfully copied {doc_count} documents from fixture")
+        return
 
     # Load query configuration
     import yaml

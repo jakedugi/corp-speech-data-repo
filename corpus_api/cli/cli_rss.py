@@ -3,8 +3,8 @@
 import typer
 from pathlib import Path
 
-from corp_speech_risk_dataset.api.config.rss_config import load_config
-from corp_speech_risk_dataset.api.orchestrators.rss_orchestrator import RSSOrchestrator
+from corpus_api.config.rss_config import load_config
+from corpus_api.orchestrators.rss_orchestrator import RSSOrchestrator
 
 app = typer.Typer()
 

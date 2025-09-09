@@ -2,7 +2,7 @@ import os
 import pytest
 from typer.testing import CliRunner
 from pathlib import Path
-from corp_speech_risk_dataset.cli import app
+from corpus_api.cli.fetch import app
 
 runner = CliRunner()
 
