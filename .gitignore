@@ -440,7 +440,7 @@ postgresql.log
 # AWS
 .aws/
 credentials
-config
+.aws/config
 
 # Google Cloud
 gcp-key.json
