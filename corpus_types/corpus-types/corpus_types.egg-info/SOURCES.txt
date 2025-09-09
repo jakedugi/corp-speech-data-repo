@@ -1,0 +1,11 @@
+README.md
+pyproject.toml
+corpus_types.egg-info/PKG-INFO
+corpus_types.egg-info/SOURCES.txt
+corpus_types.egg-info/dependency_links.txt
+corpus_types.egg-info/entry_points.txt
+corpus_types.egg-info/requires.txt
+corpus_types.egg-info/top_level.txt
+tests/test_ids.py
+tests/test_schemas.py
+tests/test_validate_cli.py

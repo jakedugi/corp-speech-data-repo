@@ -1,0 +1,83 @@
+# Quote extraction configuration
+# This file controls quote detection, extraction, and attribution
+
+extraction:
+  # Quote detection patterns
+  quote_patterns:
+    - pattern: '"([^"]*)"'
+      type: "double_quotes"
+    - pattern: '«([^»]*)»'
+      type: "guillemets"
+    - pattern: ""([^"]*)""
+      type: "curly_quotes"
+
+  # Minimum quote length
+  min_quote_length: 10
+  max_quote_length: 10000
+
+  # Speaker attribution
+  attribution:
+    enabled: true
+    max_speaker_distance: 500  # characters before quote
+    speaker_patterns:
+      - "said\\s+([^,.:;]+)"
+      - "stated\\s+([^,.:;]+)"
+      - "according to\\s+([^,.:;]+)"
+      - "explained\\s+([^,.:;]+)"
+
+  # Quote filtering
+  filtering:
+    remove_duplicates: true
+    remove_overlaps: true
+    min_confidence: 0.7
+
+  # Context extraction
+  context:
+    before_chars: 200
+    after_chars: 200
+    include_speaker: true
+    include_metadata: true
+
+  # Performance settings
+  batch_size: 100
+  max_workers: 4
+
+reranking:
+  # Semantic reranking settings
+  enabled: true
+  model: "sentence-transformers/all-MiniLM-L6-v2"
+  threshold: 0.8
+
+  # Quality thresholds
+  min_semantic_score: 0.6
+  max_redundancy_score: 0.8
+
+filtering:
+  # Final filtering criteria
+  heuristics:
+    - name: "speaker_required"
+      enabled: true
+      threshold: 0.8
+
+    - name: "context_quality"
+      enabled: true
+      threshold: 0.7
+
+    - name: "length_appropriate"
+      enabled: true
+      min_length: 20
+      max_length: 5000
+
+  # Legal document specific filters
+  legal_filters:
+    court_opinions_only: false
+    include_dissents: true
+    include_concurrences: true
+    exclude_routine_matters: true
+
+validation:
+  # Output validation
+  require_quote_id: true
+  require_doc_id: true
+  require_span: true
+  validate_offsets: true
