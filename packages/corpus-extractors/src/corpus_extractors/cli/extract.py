@@ -13,8 +13,8 @@ from typing import Optional
 import typer
 import logging
 
-from ..quote_extractor import QuoteExtractor
-from ..case_outcome_imputer import CaseOutcomeImputer
+from ..extract_quotes import QuoteExtractor
+from ..extract_outcomes import CaseOutcomeImputer
 
 app = typer.Typer()
 logger = logging.getLogger(__name__)

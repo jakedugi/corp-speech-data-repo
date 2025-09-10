@@ -258,108 +258,44 @@ class Doc(StrictBase):
 
 class Quote(ExtensibleBase):
     """
-    Quote model representing an extracted and processed quote from a document.
+    Quote model representing core extracted fields from a document.
 
-    This comprehensive model captures all the fields used in the actual pipeline,
-    including processing stages, embeddings, features, and predictions.
+    This model contains only the essential pre-ML fields needed for downstream
+    processing and modeling. All ML features, embeddings, and predictions are excluded.
     """
 
     schema_version: SchemaVersion = "1.0"
     quote_id: Optional[str] = Field(None, description="Unique quote identifier")
-    doc_id: str = Field(..., description="Document this quote belongs to")
 
-    # Core quote fields
+    # Core identifiers
+    doc_id: str = Field(..., description="Document this quote belongs to")
+    case_id: Optional[str] = Field(None, description="Case identifier")
+    case_id_clean: Optional[str] = Field(None, description="Clean case identifier")
+    case_year: Optional[int] = Field(None, description="Case year")
+    record_id: Optional[int] = Field(None, description="Record identifier")
+
+    # Provenance fields
+    court: Optional[str] = Field(None, description="Court name (extracted from doc_id or metadata)")
+    law: Optional[str] = Field(None, description="Law type (extracted from query or content)")
+    company: Optional[str] = Field(None, description="Company name (extracted from search or headers)")
+
+    # Core quote content
     text: str = Field(..., description="Quote text content")
     context: Optional[str] = Field(None, description="Surrounding context")
     speaker: Optional[str] = Field(None, description="Speaker of the quote")
     score: Optional[float] = Field(None, description="Confidence/extraction score")
     urls: List[str] = Field(default_factory=list, description="Source URLs")
 
-    # Processing fields
-    stage: Optional[int] = Field(None, description="Processing stage")
-    span: Optional[Span] = Field(None, description="Text span with start/end positions")
-
-    # Encoding outputs
-    sp_ids: List[int] = Field(default_factory=list, description="SentencePiece IDs")
-    deps: List[Tuple[int, int, str]] = Field(
-        default_factory=list, description="Dependency edges"
-    )
-    byte_fallback: Optional[bool] = Field(
-        None, description="Whether byte fallback was used"
-    )
-    fallback_chars: List[str] = Field(
-        default_factory=list, description="Fallback characters"
-    )
-
-    # Embeddings and features
-    legal_bert_emb: List[float] = Field(
-        default_factory=list, description="Legal BERT embeddings"
-    )
-    legal_bert_quote_top_keywords_emb: List[float] = Field(
-        default_factory=list, description="Quote keyword embeddings"
-    )
-    legal_bert_context_top_keywords_emb: List[float] = Field(
-        default_factory=list, description="Context keyword embeddings"
-    )
-    legal_bert_speaker_emb: List[float] = Field(
-        default_factory=list, description="Speaker embeddings"
-    )
-    legal_bert_section_headers_emb: List[float] = Field(
-        default_factory=list, description="Section header embeddings"
-    )
-    fused_emb: List[float] = Field(default_factory=list, description="Fused embeddings")
-    gph_emb: List[float] = Field(default_factory=list, description="Graph embeddings")
-
-    # Processing metadata
-    gph_method: Optional[str] = Field(None, description="Graph processing method")
-    text_embedder: Optional[str] = Field(None, description="Text embedder used")
-    raw_features: Dict[str, Any] = Field(
-        default_factory=dict, description="Raw extracted features"
-    )
-
-    # Prediction results
-    final_judgement_real: Optional[float] = Field(
-        None, description="Final judgment value"
-    )
-    coral_pred_bucket: Optional[str] = Field(
-        None, description="Coral prediction bucket"
-    )
-    coral_pred_class: Optional[int] = Field(None, description="Coral prediction class")
-    coral_confidence: Optional[float] = Field(
-        None, description="Coral prediction confidence"
-    )
-    coral_class_probs: Dict[str, float] = Field(
-        default_factory=dict, description="Coral class probabilities"
-    )
-    coral_scores: List[float] = Field(
-        default_factory=list, description="Coral prediction scores"
-    )
-    coral_prob_low: Optional[float] = Field(
-        None, description="Probability of low outcome"
-    )
-    coral_prob_medium: Optional[float] = Field(
-        None, description="Probability of medium outcome"
-    )
-    coral_prob_high: Optional[float] = Field(
-        None, description="Probability of high outcome"
-    )
-    coral_model_threshold: Optional[float] = Field(
-        None, description="Coral model threshold"
-    )
-    coral_model_buckets: List[str] = Field(
-        default_factory=list, description="Coral model buckets"
-    )
-
-    # Position and token information
+    # Position and structural features
     docket_number: Optional[float] = Field(None, description="Docket number")
     docket_token_start: Optional[float] = Field(
         None, description="Token start position in docket"
     )
-    global_token_start: Optional[float] = Field(
-        None, description="Global token start position"
-    )
     docket_char_start: Optional[float] = Field(
         None, description="Character start in docket"
+    )
+    global_token_start: Optional[float] = Field(
+        None, description="Global token start position"
     )
     global_char_start: Optional[float] = Field(
         None, description="Global character start"
@@ -374,25 +310,14 @@ class Quote(ExtensibleBase):
     # Hash and identifiers
     text_hash: Optional[str] = Field(None, description="Text hash")
     text_hash_norm: Optional[str] = Field(None, description="Normalized text hash")
-    record_id: Optional[int] = Field(None, description="Record identifier")
+    urls: List[str] = Field(default_factory=list, description="Source URLs")
 
-    # Training metadata
-    fold: Optional[int] = Field(None, description="Cross-validation fold")
-    split: Optional[str] = Field(None, description="Train/validation/test split")
-    outcome_bin: Optional[int] = Field(None, description="Binary outcome")
-    support_tertile: Optional[float] = Field(None, description="Support tertile")
-    bin_weight: Optional[float] = Field(None, description="Binary weight")
-    support_weight: Optional[float] = Field(None, description="Support weight")
-    sample_weight: Optional[float] = Field(None, description="Sample weight")
-
-    # Metadata and evidence
-    evidence_links: List[str] = Field(
-        default_factory=list, description="Links to supporting evidence"
+    # Outcome field (pre-ML)
+    final_judgement_real: Optional[float] = Field(
+        None, description="Final judgment value"
     )
-    meta: Meta = Field(default_factory=Meta, description="Quote metadata")
 
-    # Internal metadata fields (for data processing pipeline)
-    _src: Optional[str] = Field(None, description="Source path")
+    # Internal processing metadata
     _metadata_src_path: Optional[str] = Field(None, description="Metadata source path")
     _metadata_wrapped: Optional[bool] = Field(
         None, description="Whether metadata is wrapped"
@@ -456,154 +381,13 @@ class Outcome(StrictBase):
 
 
 # --------------------------------------------------------------------------- #
-# Prediction Types                                                           #
+# Removed: Prediction Types (ML outputs excluded from pre-ML schema)      #
 # --------------------------------------------------------------------------- #
 
 
-class Prediction(ExtensibleBase):
-    """
-    Prediction model for quote-level or case-level predictions.
-
-    This model captures predictions from machine learning models, including
-    probabilities, predicted classes, and calibration information.
-    """
-
-    schema_version: SchemaVersion = "1.0"
-    model_version: str = Field(..., description="Version/fingerprint of the model")
-    target: str = Field(
-        ..., description="Prediction target (e.g., 'case/binary/settlement')"
-    )
-    split_id: str = Field(..., description="Cross-validation split identifier")
-    quote_id: Optional[str] = Field(
-        None, description="Quote ID for quote-level predictions"
-    )
-    case_id: Optional[str] = Field(
-        None, description="Case ID for case-level predictions"
-    )
-    proba: float = Field(..., ge=0.0, le=1.0, description="Prediction probability")
-    pred: Union[str, int] = Field(..., description="Predicted class/label")
-    calibrated: bool = Field(False, description="Whether prediction is calibrated")
-    timestamp: datetime = Field(
-        default_factory=datetime.now, description="Prediction timestamp"
-    )
-    producer: Producer = Field(..., description="Who produced this prediction")
-
-    @validator("proba")
-    def validate_proba(cls, v: float) -> float:
-        """Validate probability is between 0 and 1."""
-        if not (0.0 <= v <= 1.0):
-            raise ValueError("proba must be between 0.0 and 1.0")
-        return v
-
-    @validator("case_id")
-    def validate_at_least_one_id(
-        cls, v: Optional[str], values: Dict[str, Any]
-    ) -> Optional[str]:
-        """Ensure at least one of quote_id or case_id is provided."""
-        if "quote_id" in values and values["quote_id"] is None and v is None:
-            raise ValueError("Either quote_id or case_id must be provided")
-        return v
-
-
-class CasePrediction(ExtensibleBase):
-    """
-    Case-level prediction model.
-
-    This is a specialized prediction model for case-level outcomes that
-    includes additional case-specific metadata.
-    """
-
-    schema_version: SchemaVersion = "1.0"
-    model_version: str = Field(..., description="Version/fingerprint of the model")
-    target: str = Field(..., description="Prediction target")
-    split_id: str = Field(..., description="Cross-validation split identifier")
-    case_id: str = Field(..., description="Case ID")
-    proba: float = Field(..., ge=0.0, le=1.0, description="Prediction probability")
-    pred: Union[str, int] = Field(..., description="Predicted class/label")
-    calibrated: bool = Field(False, description="Whether prediction is calibrated")
-    timestamp: datetime = Field(
-        default_factory=datetime.now, description="Prediction timestamp"
-    )
-    meta: Meta = Field(default_factory=Meta, description="Prediction metadata")
-    producer: Producer = Field(..., description="Who produced this case prediction")
-
-    @validator("case_id")
-    def validate_case_id(cls, v: str) -> str:
-        """Validate that case_id is not empty."""
-        if not v or not v.strip():
-            raise ValueError("case_id cannot be empty")
-        return v.strip()
-
-    @validator("proba")
-    def validate_proba(cls, v: float) -> float:
-        """Validate probability is between 0 and 1."""
-        if not (0.0 <= v <= 1.0):
-            raise ValueError("proba must be between 0.0 and 1.0")
-        return v
-
-
 # --------------------------------------------------------------------------- #
-# Feature Types                                                               #
+# Removed: Feature Types (ML features excluded from pre-ML schema)         #
 # --------------------------------------------------------------------------- #
-
-
-class QuoteFeatures(ExtensibleBase):
-    """
-    Quote features model containing extracted features for a quote.
-
-    This model captures the feature vector and interpretable features
-    extracted from a quote for machine learning purposes.
-    """
-
-    schema_version: SchemaVersion = "1.0"
-    feature_version: str = Field(
-        ..., description="Version of feature extraction pipeline"
-    )
-    quote_id: str = Field(..., description="Quote this feature vector belongs to")
-    vector: List[float] = Field(..., description="Feature vector")
-    interpretable: Dict[str, float] = Field(
-        default_factory=dict, description="Human-interpretable features"
-    )
-    producer: Producer = Field(..., description="Who produced these features")
-
-    @validator("quote_id")
-    def validate_quote_id(cls, v: str) -> str:
-        """Validate that quote_id is not empty."""
-        if not v or not v.strip():
-            raise ValueError("quote_id cannot be empty")
-        return v.strip()
-
-    @validator("vector")
-    def validate_vector(cls, v: List[float]) -> List[float]:
-        """Validate vector is not empty."""
-        if not v:
-            raise ValueError("vector cannot be empty")
-        return v
-
-
-class CaseVector(ExtensibleBase):
-    """
-    Case vector model containing aggregated features for a case.
-
-    This model captures the aggregated features and statistics for an entire
-    legal case, computed from all quotes within the case.
-    """
-
-    schema_version: SchemaVersion = "1.0"
-    agg_version: str = Field(..., description="Version of aggregation pipeline")
-    case_id: str = Field(..., description="Case this vector belongs to")
-    stats: Dict[str, float] = Field(..., description="Aggregated statistics")
-    vector: List[float] = Field(
-        default_factory=list, description="Aggregated feature vector"
-    )
-    producer: Producer = Field(..., description="Who produced this case vector")
-
-    @validator("case_id")
-    def validate_case_id(cls, v: str) -> str:
-        """Validate that case_id is not empty."""
-        if not v or not v.strip():
-            raise ValueError("case_id cannot be empty")
-        return v.strip()
 
 
 # --------------------------------------------------------------------------- #
@@ -615,7 +399,8 @@ class QuoteCandidate(ExtensibleBase):
     """
     Legacy quote candidate model for backward compatibility.
 
-    This model represents a potential quote during the extraction process.
+    This model represents a potential quote during the extraction process
+    and contains only the essential pre-ML fields.
     """
 
     quote: str = Field(..., description="Quote text")
@@ -633,57 +418,3 @@ class QuoteCandidate(ExtensibleBase):
             "urls": self.urls,
             "context": self.context,
         }
-
-
-class QuoteRow(ExtensibleBase):
-    """
-    Legacy quote row model for backward compatibility.
-
-    This model represents a processed quote with encoding outputs and
-    should be aligned with the actual data structure used in the pipeline.
-    """
-
-    # Core fields
-    doc_id: str = Field(..., description="Document identifier")
-    stage: int = Field(..., description="Processing stage")
-    text: str = Field(..., description="Quote text")
-    context: Optional[str] = Field(None, description="Surrounding context")
-    speaker: Optional[str] = Field(None, description="Speaker")
-    score: Optional[float] = Field(None, description="Confidence score")
-    urls: List[str] = Field(default_factory=list, description="Source URLs")
-
-    # Encoding outputs
-    sp_ids: List[int] = Field(default_factory=list, description="SentencePiece IDs")
-    deps: List[Tuple[int, int, str]] = Field(
-        default_factory=list, description="Dependency edges"
-    )
-    wl_indices: List[int] = Field(
-        default_factory=list, description="WL feature vector indices"
-    )
-    wl_counts: List[int] = Field(
-        default_factory=list, description="WL feature vector counts"
-    )
-
-    # Additional fields from actual data
-    byte_fallback: Optional[bool] = Field(None, description="Byte fallback flag")
-    fallback_chars: List[str] = Field(
-        default_factory=list, description="Fallback characters"
-    )
-    gph_method: Optional[str] = Field(None, description="Graph processing method")
-
-    # Internal metadata
-    _src: Optional[str] = Field(None, description="Source path")
-
-    @validator("doc_id")
-    def validate_doc_id(cls, v: str) -> str:
-        """Validate that doc_id is not empty."""
-        if not v or not v.strip():
-            raise ValueError("doc_id cannot be empty")
-        return v.strip()
-
-    @validator("text")
-    def validate_text(cls, v: str) -> str:
-        """Validate that text is not empty."""
-        if not v or not v.strip():
-            raise ValueError("text cannot be empty")
-        return v.strip()

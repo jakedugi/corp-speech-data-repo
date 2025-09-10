@@ -1,6 +1,6 @@
 import re
 import unicodedata
-from typing import Dict, List, Tuple
+from typing import Dict, List, Tuple, Optional
 
 
 class TextCleaner:
@@ -17,6 +17,9 @@ class TextCleaner:
         "\u2014": "-",
         "\u00A0": " ",
     }
+
+    def __init__(self, config: Optional[Dict] = None):
+        self.config = config or {}
 
     def clean(self, text: str) -> str:
         text = self._PAGE_MARKER.sub("", text)

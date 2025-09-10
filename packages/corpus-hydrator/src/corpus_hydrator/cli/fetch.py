@@ -1,22 +1,20 @@
 #!/usr/bin/env python3
 """
-CLI interface for corpus-api module.
+CLI interface for corpus-hydrator module.
 
 Usage:
-    python -m corpus_api.cli.fetch courtlistener --query query.yaml --output docs.jsonl
-    python -m corpus_api.cli.fetch rss --feeds feeds.yaml --output docs.jsonl
-    python -m corpus_api.cli.fetch wikipedia --pages pages.yaml --output docs.jsonl
+    python -m corpus_hydrator.cli.fetch courtlistener --query query.yaml --output-dir output/
+    python -m corpus_hydrator.cli.fetch rss --feeds feeds.yaml --output-dir output/
+    python -m corpus_hydrator.cli.fetch wikipedia --pages pages.yaml --output-dir output/
 """
 
-import json
 from pathlib import Path
 from typing import Optional
 import typer
 import logging
+import yaml
 
-from ..adapters.courtlistener.courtlistener_client import CourtListenerClient
-from ..adapters.rss.rss_client import RSSClient
-from ..adapters.wikipedia.sandp_scraper import WikipediaScraper
+from ..pipeline import run_courtlistener_fetch, run_rss_fetch, run_wikipedia_scrape
 
 app = typer.Typer()
 logger = logging.getLogger(__name__)
@@ -27,14 +25,11 @@ def courtlistener(
     query_file: Path = typer.Option(
         ..., "--query", help="Query configuration YAML file"
     ),
-    output_file: Path = typer.Option(
-        ..., "--output", help="Output JSONL file for documents"
+    output_dir: Path = typer.Option(
+        ..., "--output-dir", help="Output directory for documents"
     ),
     fixture_file: Optional[Path] = typer.Option(
         None, "--use-fixture", help="Use fixture file instead of API calls"
-    ),
-    config_file: Optional[Path] = typer.Option(
-        None, "--config", help="API configuration file"
     ),
     api_key: Optional[str] = typer.Option(
         None,
@@ -47,43 +42,22 @@ def courtlistener(
     Use --use-fixture for offline testing.
     """
     logger.info(f"Fetching documents from CourtListener using query: {query_file}")
-    logger.info(f"Output: {output_file}")
-
-    # Check if using fixture mode
-    if fixture_file:
-        logger.info(f"Using fixture file: {fixture_file}")
-        if not fixture_file.exists():
-            raise FileNotFoundError(f"Fixture file not found: {fixture_file}")
-
-        # Copy fixture to output (simulating fetch)
-        import shutil
-        shutil.copy2(fixture_file, output_file)
-
-        # Count documents
-        with open(output_file, "r") as f:
-            doc_count = sum(1 for _ in f)
-
-        logger.info(f"Successfully copied {doc_count} documents from fixture")
-        return
+    logger.info(f"Output directory: {output_dir}")
 
     # Load query configuration
-    import yaml
-
     with open(query_file) as f:
         query_config = yaml.safe_load(f)
 
-    # Initialize client
-    client = CourtListenerClient(api_key=api_key)
+    # Ensure output directory exists
+    output_dir.mkdir(parents=True, exist_ok=True)
 
-    # Execute query
-    documents = client.search_opinions(query_config.get("courtlistener", {}))
-
-    # Write output
-    with open(output_file, "w") as f:
-        for doc in documents:
-            f.write(json.dumps(doc, ensure_ascii=False) + "\n")
-
-    logger.info(f"Successfully fetched {len(documents)} documents")
+    # Run pipeline
+    run_courtlistener_fetch(
+        query_config=query_config,
+        output_dir=output_dir,
+        api_key=api_key,
+        fixture_file=fixture_file,
+    )
 
 
 @app.command()
@@ -91,8 +65,8 @@ def rss(
     feeds_file: Path = typer.Option(
         ..., "--feeds", help="RSS feeds configuration YAML file"
     ),
-    output_file: Path = typer.Option(
-        ..., "--output", help="Output JSONL file for documents"
+    output_dir: Path = typer.Option(
+        ..., "--output-dir", help="Output directory for documents"
     ),
     max_entries: int = typer.Option(
         100, "--max-entries", help="Maximum entries per feed"
@@ -102,29 +76,21 @@ def rss(
     Fetch documents from RSS feeds.
     """
     logger.info(f"Fetching documents from RSS feeds: {feeds_file}")
-    logger.info(f"Output: {output_file}")
+    logger.info(f"Output directory: {output_dir}")
 
     # Load feeds configuration
-    import yaml
-
     with open(feeds_file) as f:
         feeds_config = yaml.safe_load(f)
 
-    # Initialize client
-    client = RSSClient()
+    # Ensure output directory exists
+    output_dir.mkdir(parents=True, exist_ok=True)
 
-    # Fetch from all feeds
-    all_documents = []
-    for feed_name, feed_config in feeds_config.get("feeds", {}).items():
-        documents = client.fetch_feed(feed_config["url"], max_entries=max_entries)
-        all_documents.extend(documents)
-
-    # Write output
-    with open(output_file, "w") as f:
-        for doc in all_documents:
-            f.write(json.dumps(doc, ensure_ascii=False) + "\n")
-
-    logger.info(f"Successfully fetched {len(all_documents)} documents from RSS feeds")
+    # Run pipeline
+    run_rss_fetch(
+        feeds_config=feeds_config,
+        output_dir=output_dir,
+        max_entries=max_entries,
+    )
 
 
 @app.command()
@@ -132,49 +98,28 @@ def wikipedia(
     pages_file: Path = typer.Option(
         ..., "--pages", help="Wikipedia pages configuration YAML file"
     ),
-    output_file: Path = typer.Option(
-        ..., "--output", help="Output JSONL file for documents"
+    output_dir: Path = typer.Option(
+        ..., "--output-dir", help="Output directory for documents"
     ),
 ):
     """
     Scrape documents from Wikipedia pages.
     """
     logger.info(f"Scraping documents from Wikipedia pages: {pages_file}")
-    logger.info(f"Output: {output_file}")
+    logger.info(f"Output directory: {output_dir}")
 
     # Load pages configuration
-    import yaml
-
     with open(pages_file) as f:
         pages_config = yaml.safe_load(f)
 
-    # Initialize scraper
-    scraper = WikipediaScraper()
+    # Ensure output directory exists
+    output_dir.mkdir(parents=True, exist_ok=True)
 
-    # Scrape all pages
-    all_documents = []
-    for page_name, page_config in pages_config.get("pages", {}).items():
-        content = scraper.scrape_page(page_config["title"])
-        if content:
-            doc = {
-                "doc_id": f"wiki_{page_name}",
-                "source_uri": f"https://en.wikipedia.org/wiki/{page_config['title']}",
-                "retrieved_at": "2024-01-01T00:00:00Z",  # Would use current timestamp
-                "raw_text": content,
-                "meta": {
-                    "source": "wikipedia",
-                    "page_title": page_config["title"],
-                    "sections": page_config.get("sections", []),
-                },
-            }
-            all_documents.append(doc)
-
-    # Write output
-    with open(output_file, "w") as f:
-        for doc in all_documents:
-            f.write(json.dumps(doc, ensure_ascii=False) + "\n")
-
-    logger.info(f"Successfully scraped {len(all_documents)} documents from Wikipedia")
+    # Run pipeline
+    run_wikipedia_scrape(
+        pages_config=pages_config,
+        output_dir=output_dir,
+    )
 
 
 if __name__ == "__main__":
