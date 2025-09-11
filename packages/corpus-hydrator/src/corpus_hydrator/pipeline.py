@@ -8,11 +8,12 @@ from pathlib import Path
 from typing import List, Optional
 import logging
 
-from .adapters.courtlistener.courtlistener_client import CourtListenerClient
-from .adapters.rss.rss_client import RSSClient
-from .adapters.wikipedia.sandp_scraper import WikipediaScraper
-from .config.courtlistener_config import CourtListenerConfig
-from .config.rss_config import RSS_FEEDS
+# Comment out problematic imports for now to focus on Wikipedia scraper
+# from .adapters.courtlistener.courtlistener_client import CourtListenerClient
+# from .adapters.rss.rss_client import RSSClient
+from .adapters.wikipedia.scraper import WikipediaScraper
+# from .config.courtlistener_config import CourtListenerConfig
+# from .config.rss_config import RSS_FEEDS
 
 logger = logging.getLogger(__name__)
 
@@ -92,38 +93,47 @@ def run_wikipedia_scrape(
     output_dir: Path,
 ) -> None:
     """
-    Scrape documents from Wikipedia pages.
+    Scrape company executive data from Wikipedia market indices.
 
     Args:
-        pages_config: Wikipedia pages configuration dictionary
-        output_dir: Output directory for scraped documents
+        pages_config: Configuration with index name (e.g., {"index": "sp500"})
+        output_dir: Output directory for scraped data
     """
-    logger.info("Scraping documents from Wikipedia pages")
-    scraper = WikipediaScraper()
+    logger.info("Scraping company executive data from Wikipedia")
 
-    # Scrape all pages
-    all_documents = []
-    for page_name, page_config in pages_config.get("pages", {}).items():
-        content = scraper.scrape_page(page_config["title"])
-        if content:
-            doc = {
-                "doc_id": f"wiki_{page_name}",
-                "source_uri": f"https://en.wikipedia.org/wiki/{page_config['title']}",
-                "retrieved_at": "2024-01-01T00:00:00Z",  # Would use current timestamp
-                "raw_text": content,
-                "meta": {
-                    "source": "wikipedia",
-                    "page_title": page_config["title"],
-                    "sections": page_config.get("sections", []),
-                },
-            }
-            all_documents.append(doc)
+    # Import here to avoid circular imports
+    from corpus_types.schemas.scraper import get_default_config
 
-    # Write output
-    output_file = output_dir / "documents.jsonl"
-    with open(output_file, "w") as f:
-        import json
-        for doc in all_documents:
-            f.write(json.dumps(doc, ensure_ascii=False) + "\n")
+    # Extract index name from config, default to sp500
+    index_name = pages_config.get("index", "sp500")
 
-    logger.info(f"Successfully scraped {len(all_documents)} documents from Wikipedia")
+    # Create configuration
+    config = get_default_config()
+    config.enabled_indices = [index_name]
+    config.dry_run = pages_config.get("dry_run", False)
+    config.scraping.max_companies = pages_config.get("max_companies", None)
+    config.scraping.output_dir = str(output_dir)
+
+    # Create and run scraper
+    scraper = WikipediaScraper(config)
+
+    # Scrape companies
+    companies, result = scraper.scrape_index(index_name)
+
+    if not companies:
+        logger.warning(f"No companies found for index {index_name}")
+        return
+
+    logger.info(f"Found {len(companies)} companies")
+
+    # Scrape executives
+    logger.info("Scraping executive information...")
+    officers = scraper.scrape_executives_for_companies(companies)
+
+    total_officers = sum(len(officers_list) for officers_list in officers.values())
+    logger.info(f"Found {total_officers} executives across {len(officers)} companies")
+
+    # Save results (this will create the CSV files)
+    scraper.save_results(companies, officers, index_name)
+
+    logger.info(f"Successfully scraped executive data from {index_name} index")

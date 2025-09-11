@@ -2,17 +2,16 @@
 requires = [
   "setuptools>=61.0",
   "wheel",
-  "uv_build>=0.7.20,<0.8.0",
-  "pip",               # ensure pip is bootstrapped
-  "numpy>=1.26.4",     # make NumPy available at build time
+  "pip",
+  "numpy>=1.26.4",
   "Cython>=0.27.3",
   "scipy==1.13.0 ; platform_machine=='arm64'",
 ]
-build-backend = "uv_build"
-# Had to switch to setuptools to build GraKeL to support building C/C++ extensions which uv_build only supports pure python extensions
+build-backend = "setuptools.build_meta"
+# Using setuptools so compiled deps (e.g., GraKeL) build correctly.
 
 [project]
-name = "corp-speech-risk-dataset"
+name = "corp-speech-data-repo"
 version = "0.1.0"
 description = "Pipeline to collect and structure corporate speech legal risk examples."
 authors = [
@@ -112,7 +111,6 @@ dependencies = [
   "umap-learn>=0.5.9.post2",
   "plotly>=6.2.0",
   "feedparser>=6.0.11",
-  "pytest>=8.4.1",
   "imblearn>=0.0",
   "ujson>=5.10.0",
   "langdetect>=1.0.9",
@@ -128,8 +126,16 @@ dependencies = [
   "statsmodels>=0.14.5",
   "tabulate>=0.9.0",
   "pandoc>=2.4",
+  "black>=23.0.0",
+  "isort>=5.0.0",
+  "mypy>=1.0.0",
+  "pytest>=8.4.1",
+  "pytest-cov>=4.0.0",
+  "pytest-asyncio",
 ]
 
+[project.scripts]
+hydrator = "corpus_hydrator.cli.fetch:app"
 
 
 [project.optional-dependencies]
@@ -140,14 +146,6 @@ cpu = [
 gpu = [
   "torch>=2.7.1 ; sys_platform == 'linux'",
   "torchvision>=0.14.1 ; sys_platform == 'linux'",
-]
-dev = [
-  "black>=23.0.0",
-  "isort>=5.0.0",
-  "mypy>=1.0.0",
-  "pytest>=8.4.1",
-  "pytest-cov>=4.0.0",
-  "pytest-asyncio",
 ]
 
 
@@ -207,23 +205,17 @@ ignore_missing_imports = true
 [tool.pytest.ini_options]
 testpaths = ["tests"]
 python_files = ["test_*.py"]
-python_paths = ["src"]
-
-
-[dependency-groups]
-dev = [
-  "black>=23.0.0",
-  "isort>=5.0.0",
-  "mypy>=1.0.0",
-  "pytest>=8.4.1",
-  "pytest-cov>=4.0.0",
-  "pytest-asyncio",
-]
-
-[tool.setuptools.packages.find]
-where = ["src"]
+python_paths = ["packages/corpus-cleaner/src", "packages/corpus-extractors/src", "packages/corpus-hydrator/src", "packages/corpus-types/src"]
 
 
 [tool.setuptools]
-# universal2 wheels if you're going to publish on PyPI
-plat-name = "macosx-11.0-arm64"
+package-dir = {"" = "."}
+
+[tool.setuptools.packages.find]
+where = [
+  "packages/corpus-hydrator/src",
+  "packages/corpus-types/src",
+  "packages/corpus-extractors/src",
+  "packages/corpus-cleaner/src",
+]
+include = ["corpus_*"]

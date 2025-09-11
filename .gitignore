@@ -513,6 +513,7 @@ coverage/
 htmlcov/
 .coverage
 *.cover
+test_output/
 
 # CI/CD
 .github/workflows/*.log
@@ -571,8 +572,10 @@ Session.vim
 # PROJECT SPECIFIC
 # =============================================================================
 
-# Data directories (uncomment as needed)
-# data/
+# Data directories
+data/
+!data/raw/
+!data/processed/
 # raw_data/
 # processed_data/
 # models/

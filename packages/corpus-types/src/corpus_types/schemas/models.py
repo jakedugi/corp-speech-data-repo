@@ -8,6 +8,7 @@ validation and serialization capabilities.
 
 from __future__ import annotations
 
+import re
 from datetime import datetime
 from typing import Dict, List, Optional, Tuple, Any, Literal, Union
 from pydantic import BaseModel, Field, validator, ConfigDict
@@ -418,3 +419,127 @@ class QuoteCandidate(ExtensibleBase):
             "urls": self.urls,
             "context": self.context,
         }
+
+
+# --------------------------------------------------------------------------- #
+# Index Constituents Types                                                    #
+# --------------------------------------------------------------------------- #
+
+
+class IndexConstituent(StrictBase):
+    """
+    Data model for an index constituent (company in a market index).
+
+    This model represents a company that is part of a market index such as
+    S&P 500, Dow Jones Industrial Average, or Nasdaq 100.
+    """
+
+    symbol: str = Field(..., description="Stock ticker symbol")
+    company_name: str = Field(..., description="Full company name")
+    index_name: str = Field(..., description="Name of the market index")
+    sector: Optional[str] = Field(None, description="Company sector (if available)")
+    industry: Optional[str] = Field(None, description="Company industry (if available)")
+    date_added: Optional[str] = Field(None, description="Date company was added to index")
+    extracted_at: datetime = Field(
+        default_factory=datetime.now, description="When data was extracted"
+    )
+    source_url: str = Field(..., description="Source Wikipedia URL")
+
+    @validator('symbol')
+    def validate_symbol(cls, v):
+        """Validate stock ticker symbol format."""
+        if not v or not v.strip():
+            raise ValueError("Symbol cannot be empty")
+
+        # Clean the symbol
+        v = v.strip().upper()
+
+        # Basic validation - should be 1-5 uppercase letters, optionally with a dot and more letters
+        if not re.match(r'^[A-Z]{1,5}(\.[A-Z]{1,2})?$', v):
+            # Allow some special cases like numbers in tickers
+            if not re.match(r'^[A-Z0-9]{1,5}(\.[A-Z0-9]{1,2})?$', v):
+                raise ValueError(f"Invalid symbol format: {v}")
+
+        return v
+
+    @validator('company_name')
+    def validate_company_name(cls, v):
+        """Validate company name."""
+        if not v or not v.strip():
+            raise ValueError("Company name cannot be empty")
+        return v.strip()
+
+    @validator('date_added')
+    def validate_date_added(cls, v):
+        """Validate date added format."""
+        if v is None:
+            return v
+
+        # Try to parse various date formats
+        date_formats = [
+            '%Y-%m-%d',  # 2023-12-15
+            '%m/%d/%Y',  # 12/15/2023
+            '%B %d, %Y', # December 15, 2023
+            '%b %d, %Y', # Dec 15, 2023
+        ]
+
+        for fmt in date_formats:
+            try:
+                datetime.strptime(v, fmt)
+                return v
+            except ValueError:
+                continue
+
+        # If no format matches, return as-is but log warning
+        import logging
+        logger = logging.getLogger(__name__)
+        logger.warning(f"Unrecognized date format: {v}")
+        return v
+
+
+class IndexExtractionResult(StrictBase):
+    """Result model for index extraction operations."""
+
+    index_name: str
+    total_constituents: int
+    extracted_at: datetime = Field(default_factory=datetime.now)
+    success: bool = True
+    error_message: Optional[str] = None
+    constituents: list = Field(default_factory=list)
+
+
+class IndexConstituentFilter(ExtensibleBase):
+    """Filter class for querying index constituents."""
+
+    symbols: Optional[List[str]] = Field(None, description="Filter by stock symbols")
+    sectors: Optional[List[str]] = Field(None, description="Filter by sectors")
+    industries: Optional[List[str]] = Field(None, description="Filter by industries")
+    date_range: Optional[Tuple[datetime, datetime]] = Field(
+        None, description="Filter by date added range"
+    )
+
+    def matches(self, constituent: IndexConstituent) -> bool:
+        """Check if a constituent matches the filter criteria."""
+        # Symbol filter
+        if self.symbols and constituent.symbol not in self.symbols:
+            return False
+
+        # Sector filter
+        if self.sectors and constituent.sector not in self.sectors:
+            return False
+
+        # Industry filter
+        if self.industries and constituent.industry not in self.industries:
+            return False
+
+        # Date range filter
+        if self.date_range and constituent.date_added:
+            try:
+                added_date = datetime.strptime(constituent.date_added, '%Y-%m-%d')
+                start_date, end_date = self.date_range
+                if not (start_date <= added_date <= end_date):
+                    return False
+            except (ValueError, TypeError):
+                pass  # Skip date filtering if parsing fails
+
+        return True
