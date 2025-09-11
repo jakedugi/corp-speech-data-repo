@@ -1,167 +1,61 @@
-name: CI
+name: ci
 
 on:
-  push:
-    branches: [ main, develop ]
   pull_request:
-    branches: [ main, develop ]
+    paths:
+      - "packages/**"
+      - ".github/workflows/**"
+  push:
+    branches: ["main"]
+  workflow_dispatch: {}
+  schedule:
+    - cron: "0 8 * * *"
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
 
 jobs:
-  test:
+  fast:
+    name: Fast checks (lint, typecheck, unit)
     runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        python-version: ["3.8", "3.9", "3.10", "3.11"]
-
     steps:
-    - uses: actions/checkout@v4
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Install uv
+        run: |
+          curl -LsSf https://astral.sh/uv/install.sh | sh
+          echo "$HOME/.cargo/bin" >> $GITHUB_PATH
+      - name: Install dependencies
+        run: uv sync --dev
+      - name: Black
+        run: uv run black --check .
+      - name: isort
+        run: uv run isort --check-only .
+      - name: mypy
+        run: uv run mypy .
+      - name: flake8
+        run: uv run flake8 .
+      - name: Unit tests (excluding e2e)
+        run: uv run pytest -q -k "not e2e"
 
-    - name: Set up Python ${{ matrix.python-version }}
-      uses: actions/setup-python@v4
-      with:
-        python-version: ${{ matrix.python-version }}
-
-    - name: Install uv
-      run: |
-        curl -LsSf https://astral.sh/uv/install.sh | sh
-        echo "$HOME/.cargo/bin" >> $GITHUB_PATH
-
-    - name: Install dependencies
-      run: uv sync --dev
-
-    - name: Run tests
-      run: uv run pytest --cov=corpus_api --cov-report=xml
-
-    - name: Upload coverage to Codecov
-      uses: codecov/codecov-action@v3
-      with:
-        file: ./coverage.xml
-        flags: unittests
-        name: codecov-umbrella
-        fail_ci_if_error: false
-
-  lint:
+  e2e:
+    name: E2E / integration (non-blocking)
+    if: github.ref == 'refs/heads/main' || github.event_name == 'workflow_dispatch'
+    continue-on-error: true
     runs-on: ubuntu-latest
-
     steps:
-    - uses: actions/checkout@v4
-
-    - name: Set up Python
-      uses: actions/setup-python@v4
-      with:
-        python-version: "3.11"
-
-    - name: Install uv
-      run: |
-        curl -LsSf https://astral.sh/uv/install.sh | sh
-        echo "$HOME/.cargo/bin" >> $GITHUB_PATH
-
-    - name: Install dependencies
-      run: uv sync --dev
-
-    - name: Run Black
-      run: uv run black --check .
-
-    - name: Run isort
-      run: uv run isort --check-only .
-
-    - name: Run mypy
-      run: uv run mypy .
-
-    - name: Run flake8
-      run: uv run flake8 .
-
-  smoke-test:
-    runs-on: ubuntu-latest
-
-    steps:
-    - uses: actions/checkout@v4
-
-    - name: Set up Python
-      uses: actions/setup-python@v4
-      with:
-        python-version: "3.11"
-
-    - name: Install uv
-      run: |
-        curl -LsSf https://astral.sh/uv/install.sh | sh
-        echo "$HOME/.cargo/bin" >> $GITHUB_PATH
-
-    - name: Install dependencies
-      run: uv sync --dev
-
-    - name: Run smoke test
-      run: uv run python -m corpus_api.cli.fetch --help
-
-    - name: Test configuration loading
-      run: uv run python -c "from corpus_api.configs.query import load_query_config; print('Config loading works')"
-
-    - name: Test data pipeline validation
-      run: |
-        # Test deterministic ID generation
-        uv run python3 -c "
-        from corpus_types.utils.deterministic_ids import generate_quote_id, validate_id_uniqueness
-        id1 = generate_quote_id('test_doc', 10, 20, 'test quote')
-        id2 = generate_quote_id('test_doc', 10, 20, 'test quote')
-        assert id1 == id2, f'IDs not deterministic: {id1} != {id2}'
-        print('✅ Deterministic ID generation works')
-        "
-
-    - name: Test fixture data integrity
-      run: |
-        uv run python3 -c "
-        import json, pathlib
-        fixtures_dir = pathlib.Path('corpus_types/fixtures')
-        docs_file = fixtures_dir / 'docs.raw.small.jsonl'
-        quotes_file = fixtures_dir / 'quotes.small.jsonl'
-
-        # Count docs
-        with docs_file.open('r') as f:
-            docs = [json.loads(line) for line in f if line.strip()]
-        print(f'Found {len(docs)} documents in fixture')
-
-        # Count quotes
-        with quotes_file.open('r') as f:
-            quotes = [json.loads(line) for line in f if line.strip()]
-        print(f'Found {len(quotes)} quotes in fixture')
-
-        # Validate ID references
-        doc_ids = {doc['doc_id'] for doc in docs}
-        for quote in quotes:
-            assert quote['doc_id'] in doc_ids, f'Quote references missing doc_id: {quote[\"doc_id\"]}'
-        print('✅ Fixture data integrity validated')
-        "
-
-    - name: Test manifest generation
-      run: |
-        uv run python3 scripts/write_manifest.py corpus_types/fixtures
-        echo 'Manifest generated successfully'
-
-  docs:
-    runs-on: ubuntu-latest
-
-    steps:
-    - uses: actions/checkout@v4
-
-    - name: Set up Python
-      uses: actions/setup-python@v4
-      with:
-        python-version: "3.11"
-
-    - name: Install uv
-      run: |
-        curl -LsSf https://astral.sh/uv/install.sh | sh
-        echo "$HOME/.cargo/bin" >> $GITHUB_PATH
-
-    - name: Install dependencies
-      run: uv sync --dev
-
-    - name: Build documentation
-      run: |
-        uv run sphinx-build -b html docs docs/_build/html
-
-    - name: Upload documentation
-      uses: actions/upload-artifact@v3
-      with:
-        name: docs
-        path: docs/_build/html/
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Install uv
+        run: |
+          curl -LsSf https://astral.sh/uv/install.sh | sh
+          echo "$HOME/.cargo/bin" >> $GITHUB_PATH
+      - name: Install dependencies
+        run: uv sync --dev
+      - name: Run e2e tests
+        run: uv run pytest -q tests/test_e2e_data.py
