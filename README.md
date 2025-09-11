@@ -1,5 +1,7 @@
 # Corporate Speech Data Repository
 
+!Work in progress CI red untill refactor complete!
+
 Data collection, cleaning, and extraction pipeline for corporate speech legal risk examples.
 
 This repository contains the data-focused modules that handle:
