@@ -10,17 +10,17 @@ This repository contains the data-focused modules that handle:
 
 ## Modules
 
-### corpus_api/
-Data collection and API client module providing unified access to multiple legal data sources including CourtListener, RSS feeds, and Wikipedia.
+### corpus_hydrator/
+Data ingestion and scraping (CourtListener, RSS, Wikipedia). Includes the index constituents subsystem and the primary CLI (`hydrator`).
 
 ### corpus_cleaner/
-Data cleaning and normalization utilities for preprocessing legal documents.
+Document normalization and offset mapping utilities.
 
 ### corpus_extractors/
-Quote extraction and case outcome imputation tools for processing legal text.
+Quote extraction, attribution, and case outcome imputation.
 
 ### corpus_types/
-Type definitions and schemas specific to data processing and extraction.
+Single source of truth for schemas, IDs, and governance (Pydantic models shared across packages).
 
 ## Data Pipeline Overview
 
@@ -31,33 +31,35 @@ Type definitions and schemas specific to data processing and extraction.
 - **Rate Limiting**: Respectful API usage with built-in rate limiting
 - **Error Handling**: Robust retry logic and error recovery
 
-## Installation
+## Installation & Environment
+
+This repo uses Astral UV for dependency and environment management.
 
 ```bash
-pip install -e .
+# Create/refresh the virtualenv
+uv sync --dev
+
+# Run any command without setting PYTHONPATH
+uv run python -c "import corpus_hydrator, corpus_types; print('ok')"
 ```
 
-## Quick Start
+## Quick Start (CLI)
 
-### CourtListener API
+All commands run via the `hydrator` CLI.
+
 ```bash
-# Set your API key
+# Show commands
+uv run hydrator --help
+
+# CourtListener (set your API key first)
 export COURT_LISTENER_API_KEY="your-api-key-here"
+uv run hydrator courtlistener --config packages/corpus-hydrator/configs/query.example.yaml --output data/docs.jsonl
 
-# Fetch documents
-corpus-fetch courtlistener --query configs/query.example.yaml --output data/docs.jsonl
-```
+# Wikipedia: Index constituents (authoritative lists)
+uv run hydrator index-constituents --index sp500 --formats csv parquet --output-dir data/ --verbose
 
-### RSS Feeds
-```bash
-# Fetch from RSS feeds
-corpus-fetch rss --feeds configs/sources/rss.yaml --output data/rss_docs.jsonl
-```
-
-### Wikipedia
-```bash
-# Scrape Wikipedia pages
-corpus-fetch wikipedia --pages configs/sources/wikipedia.yaml --output data/wiki_docs.jsonl
+# Wikipedia: Executives (dry run)
+uv run hydrator wikipedia --index sp500 --dry-run --verbose --output-dir data/
 ```
 
 ## Configuration
@@ -90,55 +92,36 @@ authentication:
   api_key_env_var: "COURT_LISTENER_API_KEY"
 ```
 
-## Module Structure
+## Repository Layout (high-level)
 
 ```
-corpus_api/
-├── cli/
-│   └── fetch.py              # Main CLI interface
-├── adapters/
-│   ├── courtlistener/        # CourtListener API client
-│   ├── rss/                  # RSS feed client
-│   └── wikipedia/            # Wikipedia scraper
-├── client/                   # Base HTTP client classes
-├── config/                   # Configuration loading
-├── orchestrators/            # High-level orchestration
-├── scripts/                  # Utility scripts
-├── tests/                    # Test suite
-├── configs/                  # Configuration files
-├── fixtures/                 # Test fixtures
-├── schemas/                  # JSON schemas
-└── notebooks/                # Exploration notebooks
+packages/
+  corpus-hydrator/
+    src/corpus_hydrator/
+      adapters/
+        index_constituents/   # providers/, parsers/, normalize.py, usecase.py, writer.py, utils/
+      cli/fetch.py            # hydrator CLI entry
+    configs/                  # e.g., query.example.yaml
+    scripts/                  # package-specific helper scripts
+
+  corpus-extractors/
+    src/corpus_extractors/    # extract_quotes.py, case_outcome_imputer.py, etc.
+
+  corpus-cleaner/
+    src/corpus_cleaner/       # normalize, offset mapping
+
+  corpus-types/
+    src/corpus_types/
+      schemas/                # authoritative Pydantic models
+
+docs/                         # project docs
+scripts/                      # root orchestration/admin scripts
+data/                         # outputs (gitignored except curated samples)
 ```
 
-## API Clients
+## Hydrator CLI (primary entrypoint)
 
-### CourtListener Client
-```python
-from corpus_api.adapters.courtlistener.courtlistener_client import CourtListenerClient
-
-client = CourtListenerClient(api_key="your-key")
-documents = client.search_opinions({
-    "courts": ["scotus"],
-    "date_range": {"start": "2020-01-01", "end": "2023-12-31"}
-})
-```
-
-### RSS Client
-```python
-from corpus_api.adapters.rss.rss_client import RSSClient
-
-client = RSSClient()
-documents = client.fetch_feed("https://www.sec.gov/rss/news/press")
-```
-
-### Wikipedia Scraper
-```python
-from corpus_api.adapters.wikipedia.sandp_scraper import WikipediaScraper
-
-scraper = WikipediaScraper()
-content = scraper.scrape_page("Corporate_law")
-```
+Prefer the CLI for ingestion tasks. See `uv run hydrator --help` for all commands.
 
 ## Data Format
 
