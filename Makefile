@@ -8,7 +8,7 @@ $(OUT):
 	mkdir -p $(OUT)
 	ln -sf $(RUN_ID) outputs/latest 2>/dev/null || true
 
-.PHONY: demo_e2e clean fetch normalize extract validate manifest help status fmt lint test ci
+.PHONY: demo_e2e clean fetch normalize extract validate manifest help status fmt lint test ci wikipedia-help wikipedia-scrape-dow wikipedia-scrape-sp500 wikipedia-scrape-nasdaq wikipedia-scrape-all
 
 help:
 	@echo "Data Pipeline Orchestrator"
@@ -22,6 +22,13 @@ help:
 	@echo "  validate    - Validate all outputs against schemas"
 	@echo "  manifest    - Generate manifest with versions and fingerprints"
 	@echo "  status      - Show current pipeline status"
+	@echo ""
+	@echo "Wikipedia Key People:"
+	@echo "  wikipedia-help        - Show Wikipedia scraper help"
+	@echo "  wikipedia-scrape-dow  - Scrape Dow Jones key people"
+	@echo "  wikipedia-scrape-sp500 - Scrape S&P 500 key people"
+	@echo "  wikipedia-scrape-nasdaq - Scrape NASDAQ 100 key people"
+	@echo "  wikipedia-scrape-all  - Scrape all supported indices"
 	@echo ""
 	@echo "Configuration:"
 	@echo "  RUN_ID=$(RUN_ID)"
@@ -87,3 +94,57 @@ fmt:      ruff format .
 lint:     ruff check . && mypy packages
 test:     pytest -q
 ci:       make lint && make test && make demo_e2e
+
+# ============================================================================
+# Wikipedia Key People Scraper
+# ============================================================================
+
+wikipedia-help:
+	@echo "Wikipedia Key People Scraper"
+	@echo ""
+	@echo "Available commands:"
+	@echo "  make wikipedia-scrape-dow     - Scrape Dow Jones constituents"
+	@echo "  make wikipedia-scrape-sp500   - Scrape S&P 500 constituents"
+	@echo "  make wikipedia-scrape-nasdaq  - Scrape NASDAQ 100 constituents"
+	@echo "  make wikipedia-scrape-all     - Scrape all supported indices"
+	@echo ""
+	@echo "Examples:"
+	@echo "  python -m corpus_hydrator.adapters.wikipedia_key_people.cli.commands scrape-index-normalized --index dow --max-companies 5 --verbose"
+
+wikipedia-scrape-dow:
+	@echo "🕷️  Scraping Dow Jones key people..."
+	python -m corpus_hydrator.adapters.wikipedia_key_people.cli.commands scrape-index-normalized --index dow --verbose
+
+wikipedia-scrape-sp500:
+	@echo "🕷️  Scraping S&P 500 key people..."
+	python -m corpus_hydrator.adapters.wikipedia_key_people.cli.commands scrape-index-normalized --index sp500 --verbose
+
+wikipedia-scrape-nasdaq:
+	@echo "🕷️  Scraping NASDAQ 100 key people..."
+	python -m corpus_hydrator.adapters.wikipedia_key_people.cli.commands scrape-index-normalized --index nasdaq100 --verbose
+
+wikipedia-scrape-all: wikipedia-scrape-dow wikipedia-scrape-sp500 wikipedia-scrape-nasdaq
+	@echo "✅ All indices scraped successfully!"
+
+# ============================================================================
+# Development Utilities
+# ============================================================================
+
+setup-wikipedia:
+	@echo "Setting up Wikipedia key people development environment..."
+	uv pip install -e . --all-extras
+	pre-commit install
+
+test-wikipedia:
+	@echo "Running Wikipedia key people tests..."
+	python -m pytest tests/unit/adapters/wikipedia_key_people/ tests/contracts/test_wikipedia_key_people_contract.py -v
+
+lint-wikipedia:
+	@echo "Linting Wikipedia key people code..."
+	flake8 packages/corpus-hydrator/src/corpus_hydrator/adapters/wikipedia_key_people/
+	mypy packages/corpus-hydrator/src/corpus_hydrator/adapters/wikipedia_key_people/ --ignore-missing-imports
+
+format-wikipedia:
+	@echo "Formatting Wikipedia key people code..."
+	black packages/corpus-hydrator/src/corpus_hydrator/adapters/wikipedia_key_people/
+	isort packages/corpus-hydrator/src/corpus_hydrator/adapters/wikipedia_key_people/

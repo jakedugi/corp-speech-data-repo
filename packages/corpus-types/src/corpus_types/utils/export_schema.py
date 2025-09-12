@@ -21,6 +21,22 @@ from corpus_types.schemas.models import (
     APIConfig,
     QuoteCandidate,
     QuoteRow,
+    IndexConstituent,
+    IndexExtractionResult,
+    IndexConstituentFilter,
+    # Wikipedia Key People models
+    WikipediaKeyPerson,
+    WikipediaCompany,
+    WikipediaExtractionResult,
+    WikipediaScrapingConfig,
+    WikipediaContentConfig,
+    WikipediaIndexConfig,
+    WikipediaKeyPeopleConfig,
+    NormalizedCompany,
+    NormalizedPerson,
+    NormalizedRole,
+    NormalizedAppointment,
+    DatasetManifest,
 )
 
 
@@ -85,6 +101,22 @@ def export_all_schemas(output_dir: Path, version: str = "1.0.0") -> None:
         (APIConfig, "api_config"),
         (QuoteCandidate, "quote_candidate"),
         (QuoteRow, "quote_row"),
+        (IndexConstituent, "index_constituent"),
+        (IndexExtractionResult, "index_extraction_result"),
+        (IndexConstituentFilter, "index_constituent_filter"),
+        # Wikipedia Key People models
+        (WikipediaKeyPerson, "wikipedia_key_person"),
+        (WikipediaCompany, "wikipedia_company"),
+        (WikipediaExtractionResult, "wikipedia_extraction_result"),
+        (WikipediaScrapingConfig, "wikipedia_scraping_config"),
+        (WikipediaContentConfig, "wikipedia_content_config"),
+        (WikipediaIndexConfig, "wikipedia_index_config"),
+        (WikipediaKeyPeopleConfig, "wikipedia_key_people_config"),
+        (NormalizedCompany, "normalized_company"),
+        (NormalizedPerson, "normalized_person"),
+        (NormalizedRole, "normalized_role"),
+        (NormalizedAppointment, "normalized_appointment"),
+        (DatasetManifest, "dataset_manifest"),
     ]
 
     for model_cls, filename_prefix in models:
@@ -137,6 +169,22 @@ def get_model_by_name(name: str) -> Optional[Type[BaseModel]]:
         "APIConfig": APIConfig,
         "QuoteCandidate": QuoteCandidate,
         "QuoteRow": QuoteRow,
+        "IndexConstituent": IndexConstituent,
+        "IndexExtractionResult": IndexExtractionResult,
+        "IndexConstituentFilter": IndexConstituentFilter,
+        # Wikipedia Key People models
+        "WikipediaKeyPerson": WikipediaKeyPerson,
+        "WikipediaCompany": WikipediaCompany,
+        "WikipediaExtractionResult": WikipediaExtractionResult,
+        "WikipediaScrapingConfig": WikipediaScrapingConfig,
+        "WikipediaContentConfig": WikipediaContentConfig,
+        "WikipediaIndexConfig": WikipediaIndexConfig,
+        "WikipediaKeyPeopleConfig": WikipediaKeyPeopleConfig,
+        "NormalizedCompany": NormalizedCompany,
+        "NormalizedPerson": NormalizedPerson,
+        "NormalizedRole": NormalizedRole,
+        "NormalizedAppointment": NormalizedAppointment,
+        "DatasetManifest": DatasetManifest,
     }
 
     return models.get(name)

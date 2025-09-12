@@ -43,7 +43,6 @@ class ScrapingConfig(BaseModel):
 
     # Rate limiting (matching original scraper)
     wikipedia_rate_limit: float = Field(default=1.0, description="Requests per second for Wikipedia")
-    sec_rate_limit: float = Field(default=10.0, description="Requests per second for SEC EDGAR (token bucket max 10 per second)")
 
     # Data limits
     max_people_per_company: int = Field(default=100, description="Maximum people to extract per company")
@@ -58,8 +57,6 @@ class ScrapingConfig(BaseModel):
     # HTTP pool settings
     wikipedia_pool_connections: int = Field(default=50, description="Wikipedia connection pool size")
     wikipedia_pool_maxsize: int = Field(default=50, description="Wikipedia max pool size")
-    sec_pool_connections: int = Field(default=10, description="SEC connection pool size")
-    sec_pool_maxsize: int = Field(default=10, description="SEC max pool size")
 
     # Output settings
     output_dir: str = Field(default="data", description="Output directory for scraped data")
@@ -81,16 +78,6 @@ class ContentExtractionConfig(BaseModel):
         description="Keywords to search for in Wikipedia infobox headers (matches original scraper)"
     )
 
-    # SEC filing patterns
-    sec_filing_type: str = Field(default="DEF 14A", description="SEC filing type to scrape")
-    officer_table_patterns: List[str] = Field(
-        default_factory=lambda: [
-            "Name and Principal Occupation",
-            "Executive Officers",
-            "Directors and Executive Officers"
-        ],
-        description="Patterns to identify officer tables in SEC filings"
-    )
 
     # Title filtering patterns (exactly matching original scraper SPX_TITLES)
     officer_title_patterns: Dict[str, str] = Field(
@@ -122,23 +109,6 @@ class ContentExtractionConfig(BaseModel):
         description="Regex patterns for fallback text extraction (matches original fallback_text_search)"
     )
 
-    # SEC heading regex (exactly matching original HEADING_REGEX)
-    sec_heading_regex: str = Field(
-        default=r"""(?xi)
-        (
-          executive\s+officers
-          | directors\s+and\s+executive\s+officers
-          | board\s+of\s+directors
-          | key\s+people
-          | leadership\s+team
-          | management\s+team
-          | corporate\s+officers?
-          | section\s+16\s+officers?
-          | named\s+executive\s+officers?
-          | [""]?officers[""]?
-        )""",
-        description="Regex pattern for SEC filing headings (exactly matches original HEADING_REGEX)"
-    )
 
 
 class ValidationConfig(BaseModel):
@@ -325,6 +295,13 @@ class ScrapingResult(BaseModel):
 
 
 # --------------------------------------------------------------------------- #
+# SEC Executive Data Models                                                   #
+# --------------------------------------------------------------------------- #
+
+
+
+
+# --------------------------------------------------------------------------- #
 # Default Configurations                                                      #
 # --------------------------------------------------------------------------- #
 
@@ -349,6 +326,8 @@ def get_multi_index_config() -> WikipediaScraperConfig:
     return config
 
 
+
+
 # --------------------------------------------------------------------------- #
 # Configuration Validation                                                    #
 # --------------------------------------------------------------------------- #
@@ -366,8 +345,6 @@ def validate_config(config: WikipediaScraperConfig) -> List[str]:
     # Check rate limits are reasonable
     if config.scraping.wikipedia_rate_limit > 10:
         issues.append("Wikipedia rate limit too high (>10 req/sec)")
-    if config.scraping.sec_rate_limit > 20:
-        issues.append("SEC rate limit too high (>20 req/sec)")
 
     # Check data limits make sense
     if config.validation.max_officers_per_company < config.validation.min_officers_required:

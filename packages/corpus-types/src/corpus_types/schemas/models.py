@@ -543,3 +543,90 @@ class IndexConstituentFilter(ExtensibleBase):
                 pass  # Skip date filtering if parsing fails
 
         return True
+
+
+# --------------------------------------------------------------------------- #
+# Wikipedia Key People Types (Imported from separate module for governance)  #
+# --------------------------------------------------------------------------- #
+
+# Import all Wikipedia key people models to make them available in the main schema
+from .wikipedia_key_people import (
+    WikipediaKeyPerson,
+    WikipediaCompany,
+    WikipediaExtractionResult,
+    WikipediaScrapingConfig,
+    WikipediaContentConfig,
+    WikipediaIndexConfig,
+    WikipediaKeyPeopleConfig,
+    NormalizedCompany,
+    NormalizedPerson,
+    NormalizedRole,
+    NormalizedAppointment,
+    DatasetManifest,
+    get_default_config,
+    get_sp500_config,
+    get_multi_index_config,
+    validate_config,
+    validate_key_person,
+    NORMALIZED_ROLE_VOCABULARY,
+    __version__ as wikipedia_key_people_version,
+)
+
+# Add to main module exports
+__all__ = [
+    # Base types
+    "StrictBase",
+    "ExtensibleBase",
+    "Meta",
+    "SchemaVersion",
+
+    # Provenance types
+    "RequestProv",
+    "ResponseProv",
+    "AdapterProv",
+    "Producer",
+    "CourtListenerProv",
+    "Provenance",
+    "Span",
+
+    # Configuration types
+    "APIConfig",
+
+    # Document types
+    "Doc",
+    "Quote",
+    "Outcome",
+
+    # Legacy types
+    "QuoteCandidate",
+
+    # Index constituent types
+    "IndexConstituent",
+    "IndexExtractionResult",
+    "IndexConstituentFilter",
+
+    # Wikipedia Key People models
+    "WikipediaKeyPerson",
+    "WikipediaCompany",
+    "WikipediaExtractionResult",
+    "WikipediaScrapingConfig",
+    "WikipediaContentConfig",
+    "WikipediaIndexConfig",
+    "WikipediaKeyPeopleConfig",
+    "NormalizedCompany",
+    "NormalizedPerson",
+    "NormalizedRole",
+    "NormalizedAppointment",
+    "DatasetManifest",
+
+    # Configuration functions
+    "get_default_config",
+    "get_sp500_config",
+    "get_multi_index_config",
+    "validate_config",
+    "validate_key_person",
+
+    # Constants
+    "NORMALIZED_ROLE_VOCABULARY",
+    "wikipedia_key_people_version",
+]
