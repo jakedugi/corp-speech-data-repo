@@ -45,29 +45,29 @@ def main():
     print("\n=== Testing Standard API Mode ===")
     try:
         client = CourtListenerClient(config, api_mode="standard")
-        print("✓ Standard API client initialized successfully")
+        print("Standard API client initialized successfully")
 
         # Test a simple search
         opinions = client.fetch_opinions(
             query="FTC Section 5", pages=1, page_size=5, date_filed_min="2023-01-01"
         )
-        print(f"✓ Retrieved {len(opinions)} opinions from standard API")
+        print(f"Retrieved {len(opinions)} opinions from standard API")
 
     except Exception as e:
-        print(f"✗ Error with standard API: {e}")
+        print(f"Error with standard API: {e}")
 
     # Test RECAP API mode
     print("\n=== Testing RECAP API Mode ===")
     try:
         client = CourtListenerClient(config, api_mode="recap")
-        print("✓ RECAP API client initialized successfully")
+        print("RECAP API client initialized successfully")
 
         # Test RECAP data fetch
         recap_data = client.fetch_recap_data(query="FTC", pages=1, page_size=5)
-        print(f"✓ Retrieved {len(recap_data)} RECAP records")
+        print(f"Retrieved {len(recap_data)} RECAP records")
 
     except Exception as e:
-        print(f"✗ Error with RECAP API: {e}")
+        print(f"Error with RECAP API: {e}")
 
     # Test processing functions
     print("\n=== Testing Processing Functions ===")
@@ -81,14 +81,14 @@ def main():
             date_min="2023-01-01",
             api_mode="standard",
         )
-        print("✓ Statute processing completed")
+        print("Statute processing completed")
 
         # Test RECAP processing
         process_recap_data(config=config, query="FTC", pages=1, page_size=5)
-        print("✓ RECAP processing completed")
+        print("RECAP processing completed")
 
     except Exception as e:
-        print(f"✗ Error with processing: {e}")
+        print(f"Error with processing: {e}")
 
     # Test new docket entries endpoint
     print("\n=== Testing Docket Entries API ===")
@@ -107,7 +107,7 @@ def main():
                 entries = client.fetch_docket_entries(
                     query=f"cluster:{cluster_id}", pages=1, page_size=5
                 )
-                print(f"✓ Retrieved {len(entries)} docket entries")
+                print(f"Retrieved {len(entries)} docket entries")
 
                 # Test docket entries processing
                 process_docket_entries(
@@ -117,14 +117,14 @@ def main():
                     page_size=5,
                     api_mode="standard",
                 )
-                print("✓ Docket entries processing completed")
+                print("Docket entries processing completed")
             else:
                 print("No cluster ID found in opinion, skipping docket entries test")
         else:
             print("No opinions available, skipping docket entries test")
 
     except Exception as e:
-        print(f"✗ Error with docket entries API: {e}")
+        print(f"Error with docket entries API: {e}")
 
     # Test new RECAP documents endpoint
     print("\n=== Testing RECAP Documents API ===")
@@ -135,7 +135,7 @@ def main():
         documents = client.fetch_recap_documents(
             query="FTC", pages=1, page_size=5, include_plain_text=True
         )
-        print(f"✓ Retrieved {len(documents)} RECAP documents")
+                print(f"Retrieved {len(documents)} RECAP documents")
 
         # Test RECAP documents processing
         process_recap_documents(
@@ -146,10 +146,10 @@ def main():
             include_plain_text=True,
             api_mode="standard",
         )
-        print("✓ RECAP documents processing completed")
+        print("RECAP documents processing completed")
 
     except Exception as e:
-        print(f"✗ Error with RECAP documents API: {e}")
+        print(f"Error with RECAP documents API: {e}")
 
     # Test full docket functionality
     print("\n=== Testing Full Docket API ===")
@@ -165,7 +165,7 @@ def main():
 
                 # Note: This would require a specific docket ID, so we'll just test the method exists
                 print(
-                    "✓ Full docket methods available (requires specific docket ID for full test)"
+                    "Full docket methods available (requires specific docket ID for full test)"
                 )
             else:
                 print("No cluster ID found, skipping full docket test")
@@ -173,7 +173,7 @@ def main():
             print("No opinions available, skipping full docket test")
 
     except Exception as e:
-        print(f"✗ Error with full docket API: {e}")
+        print(f"Error with full docket API: {e}")
 
     print("\n=== Test Complete ===")
 

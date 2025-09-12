@@ -286,7 +286,7 @@ def index_constituents(
                     # Write bundle with manifest
                     manifest = write_bundle(result.constituents, output_dir, formats)
                     success_count += 1
-                    logger.info(f"✅ Saved {result.total_constituents} companies for {result.index_name}")
+                    logger.info(f"Saved {result.total_constituents} companies for {result.index_name}")
 
                     # Show sample for each index
                     df = pd.DataFrame([c.dict() for c in result.constituents])
@@ -295,18 +295,18 @@ def index_constituents(
 
                     # Show manifest info
                     if manifest:
-                        print(f"📋 Manifest: {result.index_name.lower().replace(' ', '')}_manifest.json")
+                        print(f"Manifest: {result.index_name.lower().replace(' ', '')}_manifest.json")
                         if 'sha256_csv' in manifest:
                             print(f"   CSV SHA256: {manifest['sha256_csv'][:16]}...")
                 else:
                     error_msg = result.error_message or "Unknown error"
-                    logger.error(f"❌ Failed to extract {index_key}: {error_msg}")
+                    logger.error(f"Failed to extract {index_key}: {error_msg}")
 
             if success_count == 0:
-                logger.error("❌ No indexes were successfully extracted")
+                logger.error("No indexes were successfully extracted")
                 raise typer.Exit(1)
 
-            print(f"\n🎉 Successfully extracted {success_count}/{len(index_keys)} indexes")
+            print(f"\nSuccessfully extracted {success_count}/{len(index_keys)} indexes")
 
         else:
             result = extract_index(index, provider, parser)
@@ -314,7 +314,7 @@ def index_constituents(
             if result.success and result.constituents:
                 # Write bundle with manifest
                 manifest = write_bundle(result.constituents, output_dir, formats)
-                logger.info(f"✅ Saved {result.total_constituents} companies for {result.index_name}")
+                logger.info(f"Saved {result.total_constituents} companies for {result.index_name}")
 
                 # Show results
                 df = pd.DataFrame([c.dict() for c in result.constituents])
@@ -335,22 +335,22 @@ def index_constituents(
 
                 # Show manifest info
                 if manifest:
-                    print(f"\n📋 Manifest: {result.index_name.lower().replace(' ', '')}_manifest.json")
+                    print(f"\nManifest: {result.index_name.lower().replace(' ', '')}_manifest.json")
                     print(f"   SHA256: {manifest.get('sha256_csv', 'N/A')[:16]}...")
                     print(f"   Source: {manifest.get('source_url', 'N/A')}")
                     print(f"   Extracted: {manifest.get('extracted_at', 'N/A')}")
 
             else:
                 error_msg = result.error_message or "Unknown error"
-                logger.error(f"❌ Failed to extract {index} constituents: {error_msg}")
+                logger.error(f"Failed to extract {index} constituents: {error_msg}")
                 raise typer.Exit(1)
 
     except ImportError as e:
-        logger.error(f"❌ Import error: {e}")
+        logger.error(f"Import error: {e}")
         logger.error("Make sure the index_constituents adapter is properly installed")
         raise typer.Exit(1)
     except Exception as e:
-        logger.error(f"❌ Error: {e}")
+        logger.error(f"Error: {e}")
         raise typer.Exit(1)
 
 

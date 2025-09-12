@@ -47,7 +47,7 @@ def main():
         (DatasetManifest, "dataset_manifest"),
     ]
 
-    print("📋 Exporting Wikipedia Key People schemas...")
+    print("Exporting Wikipedia Key People schemas...")
 
     for model_cls, filename_prefix in models:
         print(f"  Exporting {model_cls.__name__}...")
@@ -60,10 +60,10 @@ def main():
         with open(output_file, "w", encoding="utf-8") as f:
             json.dump(schema, f, indent=2, ensure_ascii=False)
 
-        print(f"    ✅ {output_file}")
+        print(f"    {output_file}")
 
-    print("\n🎉 All schemas exported successfully!")
-    print(f"📁 Check the '{output_dir}' directory for JSON schema files")
+    print("\nAll schemas exported successfully!")
+    print(f"Check the '{output_dir}' directory for JSON schema files")
 
 
 if __name__ == "__main__":

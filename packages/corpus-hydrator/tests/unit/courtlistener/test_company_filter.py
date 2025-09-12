@@ -79,7 +79,7 @@ def test_company_filter_logic():
         assert "Alphabet Inc." in filtered_query
         assert "AND" in filtered_query
 
-        print("✓ Company filter logic test passed!")
+        print("Company filter logic test passed!")
 
     finally:
         # Clean up
@@ -117,10 +117,10 @@ def test_process_statutes_with_company_file():
             # Expected to fail due to missing API token, but should not fail due to parameter issues
             if "API token" in str(e) or "401" in str(e) or "403" in str(e):
                 print(
-                    "✓ process_statutes accepts company_file parameter (failed as expected due to API token)"
+                    "process_statutes accepts company_file parameter (failed as expected due to API token)"
                 )
             else:
-                print(f"✗ Unexpected error: {e}")
+                print(f"Unexpected error: {e}")
                 raise
 
     finally:

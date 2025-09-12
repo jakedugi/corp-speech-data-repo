@@ -1,10 +1,10 @@
 # Wikipedia Key People Extraction System
 
-## 📋 Overview
+## Overview
 
 The **Wikipedia Key People Extraction System** is a sophisticated, production-ready component that extracts comprehensive executive and key personnel information from Wikipedia company pages. This system provides structured data about company leadership, board members, and key roles to support downstream analysis, Named Entity Recognition (NER) models, and corporate research workflows.
 
-## 🎯 Purpose & Importance
+## Purpose & Importance
 
 ### Why This Matters
 
@@ -18,7 +18,7 @@ This system serves as a **comprehensive data enrichment layer** that significant
 
 ### Accuracy Expectations
 
-⚠️ **Important**: This system provides **high-quality, structured data** with the following quality standards:
+**Important**: This system provides **high-quality, structured data** with the following quality standards:
 
 - **Data Completeness**: Extracts comprehensive information when available
 - **Normalization Quality**: Applies advanced cleaning and standardization
@@ -26,30 +26,30 @@ This system serves as a **comprehensive data enrichment layer** that significant
 - **Structured Output**: Produces relational data with proper relationships
 - **Audit Trail**: Includes confidence scores and extraction metadata
 
-## 🏗️ Architecture Overview
+## Architecture Overview
 
 The system follows **Clean Architecture** principles with clear separation of concerns and modular design:
 
 ```
-📁 Wikipedia Key People System
-├── 🎯 providers/          # Data Sources & Strategies
+Wikipedia Key People System
+├── providers/          # Data Sources & Strategies
 │   ├── wikidata.py        # Wikidata structured API
 │   └── base.py           # Provider interfaces
-├── 🔍 parsers/           # Data Extraction
+├── parsers/           # Data Extraction
 │   └── base.py           # Base parsing classes
-├── 🔄 normalize.py       # Data Standardization & Cleaning
-├── ⚙️ usecase.py         # Business Logic & Orchestration
-├── 💾 writer.py          # Data Output & Serialization
-├── ⚙️ config.py          # Configuration Management
-├── 🌐 utils/             # Enhanced HTTP & Utilities
+├── normalize.py       # Data Standardization & Cleaning
+├── usecase.py         # Business Logic & Orchestration
+├── writer.py          # Data Output & Serialization
+├── config.py          # Configuration Management
+├── utils/             # Enhanced HTTP & Utilities
 │   ├── http.py           # Advanced HTTP client with caching
 │   ├── enums.py          # Type-safe enumerations
 │   └── logging_utils.py  # Structured logging
-├── 🎮 cli/commands.py    # Command Line Interface
-└── 🧪 Enhanced testing   # Contract tests & validation
+├── cli/commands.py    # Command Line Interface
+└── Enhanced testing   # Contract tests & validation
 ```
 
-## 🔄 Data Flow
+## Data Flow
 
 1. **Index Processing** → Extract company URLs from market index pages
 2. **Page Fetching** → Retrieve individual company Wikipedia pages with caching
@@ -60,22 +60,22 @@ The system follows **Clean Architecture** principles with clear separation of co
 7. **Quality Assurance** → Validate and score data quality
 8. **Output Generation** → Produce CSV, Parquet, and manifest files
 
-## 📊 Supported Features
+## Supported Features
 
 | Feature | Status | Description |
 |---------|--------|-------------|
-| **S&P 500** | ✅ Active | Full extraction with 500+ companies |
-| **Dow Jones** | ✅ Active | Complete extraction with 30 companies |
-| **NASDAQ-100** | ✅ Active | Comprehensive extraction with 100 companies |
-| **Multi-Strategy Parsing** | ✅ Active | Infobox, sections, tables, lists |
-| **Wikidata Integration** | ✅ Active | Structured data enhancement |
-| **Advanced Normalization** | ✅ Active | Unicode NFC, deduplication, controlled vocab |
-| **HTTP Caching** | ✅ Active | ETag, Last-Modified, revision tracking |
-| **CLI Interface** | ✅ Active | Full command-line support |
-| **Structured Logging** | ✅ Active | JSON logging with metrics |
-| **Contract Testing** | ✅ Active | Comprehensive test coverage |
+| **S&P 500** | Active | Full extraction with 500+ companies |
+| **Dow Jones** | Active | Complete extraction with 30 companies |
+| **NASDAQ-100** | Active | Comprehensive extraction with 100 companies |
+| **Multi-Strategy Parsing** | Active | Infobox, sections, tables, lists |
+| **Wikidata Integration** | Active | Structured data enhancement |
+| **Advanced Normalization** | Active | Unicode NFC, deduplication, controlled vocab |
+| **HTTP Caching** | Active | ETag, Last-Modified, revision tracking |
+| **CLI Interface** | Active | Full command-line support |
+| **Structured Logging** | Active | JSON logging with metrics |
+| **Contract Testing** | Active | Comprehensive test coverage |
 
-## 🚀 Quick Start
+## Quick Start
 
 ### Prerequisites
 
@@ -127,7 +127,7 @@ uv run python -m corpus_hydrator.adapters.wikipedia_key_people.cli.commands scra
   --verbose
 ```
 
-## 📁 Output Files
+## Output Files
 
 ### Generated Files
 
@@ -214,7 +214,7 @@ AAPL_dow,tim_cook_001,ceo_001,,https://en.wikipedia.org/wiki/Apple_Inc.,,wikiped
 }
 ```
 
-## 🧪 Testing
+## Testing
 
 ### Run All Tests
 
@@ -262,7 +262,7 @@ print(f'Normalized: {normalized}')
 "
 ```
 
-## 📋 Key Files Explained
+## Key Files Explained
 
 ### Core Components
 
@@ -344,7 +344,7 @@ print(f'Normalized: {normalized}')
 - Progress reporting and error handling
 - Structured output formatting
 
-## 🔧 Configuration Options
+## Configuration Options
 
 ### CLI Options
 
@@ -393,7 +393,7 @@ config = WikipediaKeyPeopleConfig(
 )
 ```
 
-## 🔍 Troubleshooting
+## Troubleshooting
 
 ### Common Issues
 
@@ -550,12 +550,12 @@ class MetricsCollector:
 ### Expected Results
 
 For a successful extraction, you should see:
-- ✅ **Progress indicators** during company processing
-- ✅ **Detailed logs** showing extraction strategies used
-- ✅ **File creation confirmations** for all output formats
-- ✅ **Quality metrics** in the manifest file
-- ✅ **Structured data** in all CSV and Parquet files
-- ✅ **No critical errors** in the final summary
+- **Progress indicators** during company processing
+- **Detailed logs** showing extraction strategies used
+- **File creation confirmations** for all output formats
+- **Quality metrics** in the manifest file
+- **Structured data** in all CSV and Parquet files
+- **No critical errors** in the final summary
 
 ### Data Quality Expectations
 
@@ -595,4 +595,4 @@ reports.generate_executive_transition_report(changes)
 
 ---
 
-**Remember**: This system provides **authoritative, structured executive data** that serves as a foundation for corporate analysis, NER model training, and compliance workflows. The multi-strategy approach and advanced normalization ensure **high-quality, reliable data** for production use! 🚀
+**Remember**: This system provides **authoritative, structured executive data** that serves as a foundation for corporate analysis, NER model training, and compliance workflows. The multi-strategy approach and advanced normalization ensure **high-quality, reliable data** for production use!

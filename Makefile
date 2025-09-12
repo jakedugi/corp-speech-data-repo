@@ -36,49 +36,49 @@ help:
 	@echo "  QUERY=$(QUERY)"
 
 demo_e2e: $(OUT) clean fetch normalize extract validate manifest
-	@echo "✅ Data pipeline complete!"
-	@echo "📊 Check $(OUT)/manifest.json for results"
-	@echo "🔗 Latest run: outputs/latest"
+	@echo "Data pipeline complete!"
+	@echo "Check $(OUT)/manifest.json for results"
+	@echo "Latest run: outputs/latest"
 
 clean:
-	@echo "🧹 Cleaning outputs directory..."
+	@echo "Cleaning outputs directory..."
 	rm -rf $(OUT) && mkdir -p $(OUT)
 
 fetch:
-	@echo "📥 Fetching raw documents..."
+	@echo "Fetching raw documents..."
 	@if [ -f "fixtures/docs.raw.small.jsonl" ]; then \
 		hydrator fetch --query $(QUERY) --out $(OUT)/docs.raw.jsonl --use-fixture fixtures/docs.raw.small.jsonl; \
 	else \
 		hydrator fetch --query $(QUERY) --out $(OUT)/docs.raw.jsonl; \
 	fi
-	@echo "✅ Fetched documents to $(OUT)/docs.raw.jsonl"
+	@echo "Fetched documents to $(OUT)/docs.raw.jsonl"
 
 normalize:
-	@echo "🧽 Normalizing documents..."
+	@echo "Normalizing documents..."
 	cleaner normalize --in $(OUT)/docs.raw.jsonl --out $(OUT)/docs.norm.jsonl --keep-offset-map
-	@echo "✅ Normalized documents to $(OUT)/docs.norm.jsonl"
+	@echo "Normalized documents to $(OUT)/docs.norm.jsonl"
 
 extract:
-	@echo "🔍 Extracting quotes and outcomes..."
+	@echo "Extracting quotes and outcomes..."
 	extract quotes   --in $(OUT)/docs.norm.jsonl --out $(OUT)/quotes.jsonl
 	extract outcomes --in $(OUT)/docs.norm.jsonl --out $(OUT)/outcomes.jsonl
-	@echo "✅ Extracted quotes to $(OUT)/quotes.jsonl"
-	@echo "✅ Extracted outcomes to $(OUT)/outcomes.jsonl"
+	@echo "Extracted quotes to $(OUT)/quotes.jsonl"
+	@echo "Extracted outcomes to $(OUT)/outcomes.jsonl"
 
 validate:
-	@echo "✅ Validating outputs..."
+	@echo "Validating outputs..."
 	corpus-validate jsonl Doc     $(OUT)/docs.norm.jsonl
 	corpus-validate jsonl Quote   $(OUT)/quotes.jsonl
 	corpus-validate jsonl Outcome $(OUT)/outcomes.jsonl
-	@echo "✅ All validations passed!"
+	@echo "All validations passed!"
 
 manifest:
-	@echo "📋 Generating manifest..."
+	@echo "Generating manifest..."
 	$(PY) scripts/write_manifest.py $(OUT)
-	@echo "✅ Manifest written to $(OUT)/manifest.json"
+	@echo "Manifest written to $(OUT)/manifest.json"
 
 status:
-	@echo "📊 Pipeline Status:"
+	@echo "Pipeline Status:"
 	@echo "  RUN_ID: $(RUN_ID)"
 	@echo "  OUTPUT: $(OUT)"
 	@echo "  LATEST: outputs/latest"
@@ -112,19 +112,19 @@ wikipedia-help:
 	@echo "  python -m corpus_hydrator.adapters.wikipedia_key_people.cli.commands scrape-index-normalized --index dow --max-companies 5 --verbose"
 
 wikipedia-scrape-dow:
-	@echo "🕷️  Scraping Dow Jones key people..."
+	@echo "Scraping Dow Jones key people..."
 	python -m corpus_hydrator.adapters.wikipedia_key_people.cli.commands scrape-index-normalized --index dow --verbose
 
 wikipedia-scrape-sp500:
-	@echo "🕷️  Scraping S&P 500 key people..."
+	@echo "Scraping S&P 500 key people..."
 	python -m corpus_hydrator.adapters.wikipedia_key_people.cli.commands scrape-index-normalized --index sp500 --verbose
 
 wikipedia-scrape-nasdaq:
-	@echo "🕷️  Scraping NASDAQ 100 key people..."
+	@echo "Scraping NASDAQ 100 key people..."
 	python -m corpus_hydrator.adapters.wikipedia_key_people.cli.commands scrape-index-normalized --index nasdaq100 --verbose
 
 wikipedia-scrape-all: wikipedia-scrape-dow wikipedia-scrape-sp500 wikipedia-scrape-nasdaq
-	@echo "✅ All indices scraped successfully!"
+	@echo "All indices scraped successfully!"
 
 # ============================================================================
 # Development Utilities

@@ -80,7 +80,7 @@ class TestScrapeIndexCommand:
                 ])
 
         assert result.exit_code == 0
-        assert "✅ Extraction Complete!" in result.output
+        assert "Extraction Complete!" in result.output
         assert "Companies processed: 1" in result.output
         assert "Total key people: 1" in result.output
 
@@ -146,7 +146,7 @@ class TestScrapeIndexCommand:
         ])
 
         assert result.exit_code == 0  # CLI handles errors gracefully
-        assert "❌ Extraction failed" in result.output
+        assert "Extraction failed" in result.output
 
     def test_scrape_index_invalid_index(self):
         """Test handling of invalid index name."""
@@ -210,8 +210,8 @@ class TestScrapeMultipleCommand:
                 ])
 
         assert result.exit_code == 0
-        assert "✅ sp500: 2/2 companies" in result.output
-        assert "✅ dow: 1/1 companies" in result.output
+        assert "sp500: 2/2 companies" in result.output
+        assert "dow: 1/1 companies" in result.output
         assert "Total companies processed: 3" in result.output
         assert "Total key people extracted: 5" in result.output
 
@@ -315,7 +315,7 @@ class TestErrorScenarios:
         ])
 
         assert result.exit_code == 1  # Should exit with error
-        assert "❌ Error:" in result.output
+        assert "Error:" in result.output
 
     def test_missing_required_args(self):
         """Test handling of missing required arguments."""

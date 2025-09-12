@@ -1,10 +1,10 @@
 # Index Constituents Extraction System
 
-## 📋 Overview
+## Overview
 
 The **Index Constituents Extraction System** is a critical first-step component that provides company data to enhance CourtListener queries and downstream Named Entity Recognition (NER) processes. This system extracts current company lists from major stock indices to help identify and prioritize company mentions in legal documents.
 
-## 🎯 Purpose & Importance
+## Purpose & Importance
 
 ### Why This Matters
 
@@ -16,34 +16,34 @@ This system serves as a **helper dataset** that significantly improves the perfo
 
 ### Accuracy Expectations
 
-⚠️ **Important**: This is **NOT** a training dataset and does not need 100% accuracy. The goal is **relevance over perfection**:
+**Important**: This is **NOT** a training dataset and does not need 100% accuracy. The goal is **relevance over perfection**:
 
 - Missing a few companies is acceptable
 - Some outdated entries are fine
 - The focus is on providing a **useful signal** for downstream processes
 - Quality matters more than completeness
 
-## 🏗️ Architecture Overview
+## Architecture Overview
 
 The system follows **Clean Architecture** principles with clear separation of concerns:
 
 ```
-📁 Index Constituents System
-├── 🎯 providers/          # Data Sources
+Index Constituents System
+├── providers/          # Data Sources
 │   ├── wikipedia.py      # Main: Wikipedia scraping
 │   ├── fmp.py           # Future: Financial Modeling Prep API
 │   └── yahoo_etf.py     # Future: Yahoo Finance ETF data
-├── 🔍 parsers/           # Data Extractors
+├── parsers/           # Data Extractors
 │   └── html_table.py    # HTML table parsing
-├── 🔄 normalize.py       # Data Standardization
-├── ⚙️ usecase.py         # Business Logic
-├── 💾 writer.py          # Output Generation
-├── ⚙️ config.py          # Index Configurations
-├── 🌐 utils/http.py      # HTTP Client with Caching
-└── 🎮 cli/fetch.py       # Command Line Interface
+├── normalize.py       # Data Standardization
+├── usecase.py         # Business Logic
+├── writer.py          # Output Generation
+├── config.py          # Index Configurations
+├── utils/http.py      # HTTP Client with Caching
+└── cli/fetch.py       # Command Line Interface
 ```
 
-## 🔄 Data Flow
+## Data Flow
 
 1. **Fetch** → Get raw HTML from data sources
 2. **Parse** → Extract tables from HTML
@@ -51,15 +51,15 @@ The system follows **Clean Architecture** principles with clear separation of co
 4. **Validate** → Ensure data quality and completeness
 5. **Write** → Generate CSV, Parquet, and manifest files
 
-## 📊 Supported Indices
+## Supported Indices
 
 | Index | Companies | Status | Source |
 |-------|-----------|--------|--------|
-| **S&P 500** | ~500 | ✅ Active | Wikipedia |
-| **Dow Jones** | ~30 | ✅ Active | Wikipedia |
-| **Nasdaq 100** | ~100 | ✅ Active | Wikipedia |
+| **S&P 500** | ~500 | Active | Wikipedia |
+| **Dow Jones** | ~30 | Active | Wikipedia |
+| **Nasdaq 100** | ~100 | Active | Wikipedia |
 
-## 🚀 Quick Start
+## Quick Start
 
 ### Prerequisites
 
@@ -103,7 +103,7 @@ uv run python -m corpus_hydrator.cli.fetch index-constituents \
   --verbose
 ```
 
-## 📁 Output Files
+## Output Files
 
 ### Generated Files
 
@@ -140,7 +140,7 @@ MSFT,Microsoft Corp.,S&P 500,Technology,Software,1994-06-01,https://en.wikipedia
 }
 ```
 
-## 🧪 Testing
+## Testing
 
 ### Run All Tests
 
@@ -179,7 +179,7 @@ uv run python -m corpus_hydrator.cli.fetch index-constituents --index sp500 --fo
 uv run python -m corpus_hydrator.cli.fetch index-constituents --index sp500 --format parquet
 ```
 
-## 📋 Key Files Explained
+## Key Files Explained
 
 ### Core Components
 
@@ -250,7 +250,7 @@ uv run python -m corpus_hydrator.cli.fetch index-constituents --index sp500 --fo
 - Supports multiple indices, formats, and options
 - Provides progress reporting and error handling
 
-## 🔧 Configuration Options
+## Configuration Options
 
 ### CLI Options
 
@@ -270,7 +270,7 @@ uv run python -m corpus_hydrator.cli.fetch index-constituents --index sp500 --fo
 - `nasdaq100` - Nasdaq 100
 - `all` - All supported indices
 
-## 🔍 Troubleshooting
+## Troubleshooting
 
 ### Common Issues
 
@@ -305,7 +305,7 @@ cat data/sp500_manifest.json
 head -5 data/sp500_constituents.csv
 ```
 
-## 📈 Performance & Reliability
+## Performance & Reliability
 
 ### Caching
 - **HTTP ETags**: Avoids re-downloading unchanged content
@@ -322,7 +322,7 @@ head -5 data/sp500_constituents.csv
 - **Manifest metadata**: Complete audit trail
 - **Deterministic output**: Consistent results across runs
 
-## 🔮 Future Extensions
+## Future Extensions
 
 ### Ready-to-Extend Features
 
@@ -358,7 +358,7 @@ def write_jsonl(df: pd.DataFrame, output_path: Path) -> str:
     pass
 ```
 
-## 📞 Support
+## Support
 
 ### Getting Help
 
@@ -370,12 +370,12 @@ def write_jsonl(df: pd.DataFrame, output_path: Path) -> str:
 ### Expected Results
 
 For a successful extraction, you should see:
-- ✅ Progress messages during extraction
-- ✅ File creation confirmations
-- ✅ Final summary with company counts
-- ✅ No error messages in logs
+- Progress messages during extraction
+- File creation confirmations
+- Final summary with company counts
+- No error messages in logs
 
-## 🎯 Integration with Downstream Systems
+## Integration with Downstream Systems
 
 ### CourtListener Query Enhancement
 
@@ -402,4 +402,4 @@ results = courtlistener.search(enhanced_query)
 
 ---
 
-**Remember**: This system provides **valuable signal** for downstream processes. Perfect accuracy isn't required - the goal is to **significantly improve** the relevance and efficiency of legal document processing and company entity recognition! 🚀
+**Remember**: This system provides **valuable signal** for downstream processes. Perfect accuracy isn't required - the goal is to **significantly improve** the relevance and efficiency of legal document processing and company entity recognition!

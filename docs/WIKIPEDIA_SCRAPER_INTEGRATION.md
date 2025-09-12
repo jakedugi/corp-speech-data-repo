@@ -1,332 +1,332 @@
-# Wikipedia Scraper Integration Summary
+# Wikipedia Scraper Integration Smmary
 
-## 🎯 **Complete Wikipedia Scraper System - Now Fully Integrated**
+## 🎯 **Complete Wikipedia Scraper System - Now lly Integrated**
 
-I've successfully created a robust, extensible, and testable Wikipedia scraper system that follows SOC/KISS principles and integrates seamlessly with the existing corpus codebase.
+I've sccessflly created a robst, extensible, and testable Wikipedia scraper system that follows SOC/KISS principles and integrates seamlessly with the existing corps codebase.
 
 ---
 
-## 📁 **Files Created/Modified**
+## 📁 **iles Created/Modified**
 
-### **Core Schema (Authoritative Configuration)**
-- ✅ `packages/corpus-types/src/corpus_types/schemas/scraper.py` - Complete scraper configuration schema
-- ✅ `packages/corpus-types/fixtures/quotes.small.jsonl` - Updated fixtures with new fields
+### **Core Schema (Athoritative Configration)**
+- ✅ `packages/corps-types/src/corps_types/schemas/scraper.py` - Complete scraper configration schema
+- ✅ `packages/corps-types/fixtres/qotes.small.jsonl` - Updated fixtres with new fields
 
 ### **New Scraper Implementation**
-- ✅ `packages/corpus-hydrator/src/corpus_hydrator/adapters/wikipedia/scraper.py` - Main scraper class
-- ✅ `packages/corpus-hydrator/src/corpus_hydrator/adapters/wikipedia/__init__.py` - Module exports
+- ✅ `packages/corps-hydrator/src/corps_hydrator/adapters/wikipedia/scraper.py` - Main scraper class
+- ✅ `packages/corps-hydrator/src/corps_hydrator/adapters/wikipedia/__init__.py` - Modle exports
 
 ### **CLI Integration**
-- ✅ `packages/corpus-hydrator/src/corpus_hydrator/cli/fetch.py` - Added `wikipedia` command
-- ✅ Updated help text and usage examples
+- ✅ `packages/corps-hydrator/src/corps_hydrator/cli/fetch.py` - Added `wikipedia` command
+- ✅ Updated help text and sage examples
 
-### **Position Features Integration**
-- ✅ `packages/corpus-extractors/src/corpus_extractors/position_features/` - Integrated position features
-- ✅ `packages/corpus-extractors/src/corpus_extractors/extract_quotes.py` - Enhanced with position features
+### **Position eatres Integration**
+- ✅ `packages/corps-extractors/src/corps_extractors/position_featres/` - Integrated position featres
+- ✅ `packages/corps-extractors/src/corps_extractors/extract_qotes.py` - nhanced with position featres
 
-### **Case Outcome Integration**
-- ✅ `packages/corpus-extractors/src/corpus_extractors/case_outcome_imputer.py` - Integrated case outcome imputation
-- ✅ `packages/corpus-extractors/src/corpus_extractors/process_documents.py` - End-to-end processing
+### **Case Otcome Integration**
+- ✅ `packages/corps-extractors/src/corps_extractors/case_otcome_impter.py` - Integrated case otcome imptation
+- ✅ `packages/corps-extractors/src/corps_extractors/process_docments.py` - nd-to-end processing
 
-### **Court Provenance Integration**
-- ✅ `packages/corpus-extractors/src/corpus_extractors/court_provenance.py` - Court/law/company extraction
+### **Cort Provenance Integration**
+- ✅ `packages/corps-extractors/src/corps_extractors/cort_provenance.py` - Cort/law/company extraction
 
-### **Configuration & Documentation**
-- ✅ `packages/corpus-hydrator/configs/wikipedia_scraper.yaml` - Complete configuration example
-- ✅ `packages/corpus-hydrator/README_wikipedia_scraper.md` - Comprehensive documentation
-- ✅ `packages/corpus-hydrator/scripts/test_wikipedia_scraper.py` - Test suite
+### **Configration & Docmentation**
+- ✅ `packages/corps-hydrator/configs/wikipedia_scraper.yaml` - Complete configration example
+- ✅ `packages/corps-hydrator/RADM_wikipedia_scraper.md` - Comprehensive docmentation
+- ✅ `packages/corps-hydrator/scripts/test_wikipedia_scraper.py` - Test site
 
 ### **Tests**
-- ✅ `packages/corpus-hydrator/tests/test_wikipedia_scraper.py` - Unit and integration tests
+- ✅ `packages/corps-hydrator/tests/test_wikipedia_scraper.py` - Unit and integration tests
 
 ---
 
-## 🔧 **Architecture Overview**
+## 🔧 **Architectre Overview**
 
 ### **Separation of Concerns (SOC)**
 ```
-📦 corpus-types/schemas/scraper.py          # Authoritative configuration
-├── 🎯 Configuration Layer                    # Schema-driven behavior control
+📦 corps-types/schemas/scraper.py          # Athoritative configration
+├── 🎯 Configration Layer                    # Schema-driven behavior control
 
-📦 corpus-hydrator/adapters/wikipedia/      # Implementation
+📦 corps-hydrator/adapters/wikipedia/      # Implementation
 ├── 🔧 HTTP Layer                             # Rate limiting, retries, connection pooling
-├── 📊 Scraping Layer                         # Data extraction from Wikipedia/SEC
-└── 🎼 Processing Layer                       # Orchestration, merging, output formatting
+├── 📊 Scraping Layer                         # Data extraction from Wikipedia/SC
+└── 🎼 Processing Layer                       # Orchestration, merging, otpt formatting
 
-📦 corpus-extractors/                        # Integration
-├── 📍 Position Features                      # Docket/char/token position calculation
-├── ⚖️  Court Provenance                       # Court/law/company field extraction
-└── 💰 Case Outcomes                          # Final judgment imputation
+📦 corps-extractors/                        # Integration
+├── 📍 Position eatres                      # Docket/char/token position calclation
+├── ⚖️  Cort Provenance                       # Cort/law/company field extraction
+└── 💰 Case Otcomes                          # inal jdgment imptation
 ```
 
 ### **KISS Principles Applied**
-- ✅ **Single Responsibility**: Each class/module has one clear purpose
-- ✅ **Configuration-Driven**: All behavior controlled by YAML schemas
-- ✅ **Fail Fast**: Early validation with clear error messages
-- ✅ **Sensible Defaults**: Works out-of-the-box with minimal configuration
-- ✅ **Extensible**: Easy to add new indices without code changes
+- ✅ **Single Responsibility**: ach class/modle has one clear prpose
+- ✅ **Configration-Driven**: All behavior controlled by YAML schemas
+- ✅ **ail ast**: arly validation with clear error messages
+- ✅ **Sensible Defalts**: Works ot-of-the-box with minimal configration
+- ✅ **xtensible**: asy to add new indices withot code changes
 
 ---
 
-## 🚀 **Usage Examples**
+## 🚀 **Usage xamples**
 
 ### **Command Line (New)**
 ```bash
-# Scrape S&P 500 with all features
-hydrator fetch wikipedia --index sp500 --output-dir data/
+# Scrape S&P  with all featres
+hydrator fetch wikipedia --index sp --otpt-dir data/
 
-# Scrape with custom limits for testing
-hydrator fetch wikipedia --index sp500 --max-companies 10 --dry-run --verbose
+# Scrape with cstom limits for testing
+hydrator fetch wikipedia --index sp --max-companies  --dry-rn --verbose
 
 # Scrape different indices
-hydrator fetch wikipedia --index dow --output-dir data/
-hydrator fetch wikipedia --index nasdaq100 --output-dir data/
+hydrator fetch wikipedia --index dow --otpt-dir data/
+hydrator fetch wikipedia --index nasdaq --otpt-dir data/
 ```
 
 ### **Python API**
 ```python
-from corpus_hydrator.adapters.wikipedia.scraper import WikipediaScraper
-from corpus_types.schemas.scraper import get_default_config
+from corps_hydrator.adapters.wikipedia.scraper import WikipediaScraper
+from corps_types.schemas.scraper import get_defalt_config
 
-# Configure for S&P 500
-config = get_default_config()
-config.enabled_indices = ["sp500"]
-config.scraping.max_companies = 50  # Limit for testing
+# Configre for S&P 
+config = get_defalt_config()
+config.enabled_indices = ["sp"]
+config.scraping.max_companies =   # Limit for testing
 
-# Create and run scraper
+# Create and rn scraper
 scraper = WikipediaScraper(config)
-companies, result = scraper.scrape_index("sp500")
-officers = scraper.scrape_executives_for_companies(companies)
-scraper.save_results(companies, officers, "sp500")
+companies, reslt = scraper.scrape_index("sp")
+officers = scraper.scrape_exectives_for_companies(companies)
+scraper.save_reslts(companies, officers, "sp")
 ```
 
-### **Configuration File**
+### **Configration ile**
 ```yaml
-version: "1.0.0"
-enabled_indices: ["sp500", "dow"]
+version: ".."
+enabled_indices: ["sp", "dow"]
 
 scraping:
-  wikipedia_rate_limit: 1.0
-  max_people_per_company: 100
-  max_companies: 50  # For testing
+  wikipedia_rate_limit: .
+  max_people_per_company: 
+  max_companies:   # or testing
 
 indices:
-  sp500:
-    name: "S&P 500"
-    wikipedia_url: "https://en.wikipedia.org/wiki/List_of_S%26P_500_companies"
-    table_id: "constituents"
+  sp:
+    name: "S&P "
+    wikipedia_rl: "https://en.wikipedia.org/wiki/List_of_S%P__companies"
+    table_id: "constitents"
 ```
 
 ---
 
-## 📊 **Generated Fields**
+## 📊 **Generated ields**
 
-### **Core Company Fields**
+### **Core Company ields**
 ```json
-{
+
   "ticker": "AAPL",
   "official_name": "Apple Inc.",
-  "cik": "0000320193",
-  "wikipedia_url": "https://en.wikipedia.org/wiki/Apple_Inc.",
-  "index_name": "sp500"
-}
+  "cik": "9",
+  "wikipedia_rl": "https://en.wikipedia.org/wiki/Apple_Inc.",
+  "index_name": "sp"
+
 ```
 
-### **Executive Fields**
+### **xective ields**
 ```json
-{
+
   "name": "Tim Cook",
-  "title": "CEO",
+  "title": "CO",
   "company_ticker": "AAPL",
   "company_name": "Apple Inc.",
-  "cik": "0000320193",
-  "source": "wikipedia",
-  "scraped_at": "2024-01-01T10:00:00"
-}
+  "cik": "9",
+  "sorce": "wikipedia",
+  "scraped_at": "--T::"
+
 ```
 
-### **Enhanced Quote Fields (Integrated)**
+### **nhanced Qote ields (Integrated)**
 ```json
-{
-  "doc_id": "doc_001",
-  "case_id": "case_001",
-  "court": "Supreme Court of the United States",
-  "law": "Securities Law",
+
+  "doc_id": "doc_",
+  "case_id": "case_",
+  "cort": "Spreme Cort of the United States",
+  "law": "Secrities Law",
   "company": "Test Corporation",
-  "case_year": 2023,
-  "text": "the disclosure requirements are clear...",
-  "speaker": "Justice Roberts",
-  "docket_token_start": 150.0,
-  "global_char_start": 2048.0,
-  "final_judgement_real": 150000.0,
-  "text_hash": "hash123",
-  "_metadata_src_path": "/data/docs/doc_001.txt"
-}
+  "case_year": ,
+  "text": "the disclosre reqirements are clear...",
+  "speaker": "Jstice Roberts",
+  "docket_token_start": .,
+  "global_char_start": .,
+  "final_jdgement_real": .,
+  "text_hash": "hash",
+  "_metadata_src_path": "/data/docs/doc_.txt"
+
 ```
 
 ---
 
 ## 🔄 **Integration Points**
 
-### **1. CourtListener Provenance Enhancement**
-The scraper integrates court/law/company information that enhances the existing CourtListener data:
+### **. CortListener Provenance nhancement**
+The scraper integrates cort/law/company information that enhances the existing CortListener data:
 
 ```python
-# In court_provenance.py
-def extract_provenance_from_quote(quote: Dict[str, any]) -> Dict[str, any]:
-    return {
-        "court": extract_court_from_doc_id(quote["doc_id"]),
-        "law": extract_law_from_content(quote["context"]),
-        "company": extract_company_from_content(quote["text"])
-    }
+# In cort_provenance.py
+def extract_provenance_from_qote(qote: Dict[str, any]) -> Dict[str, any]:
+    retrn 
+        "cort": extract_cort_from_doc_id(qote["doc_id"]),
+        "law": extract_law_from_content(qote["context"]),
+        "company": extract_company_from_content(qote["text"])
+    
 ```
 
-### **2. Position Features Integration**
-Position calculations are now integrated into the quote extraction pipeline:
+### **. Position eatres Integration**
+Position calclations are now integrated into the qote extraction pipeline:
 
 ```python
-# In extract_quotes.py
-if self.case_dir and quote_dicts:
-    quote_dicts = append_positional_features(self.case_dir, quote_dicts)
-    logger.debug("Added positional features to quotes")
+# In extract_qotes.py
+if self.case_dir and qote_dicts:
+    qote_dicts = append_positional_featres(self.case_dir, qote_dicts)
+    logger.debg("Added positional featres to qotes")
 ```
 
-### **3. Case Outcome Integration**
-Final judgment amounts are integrated from case outcome imputation:
+### **. Case Otcome Integration**
+inal jdgment amonts are integrated from case otcome imptation:
 
 ```python
-# In case_outcome_imputer.py
-def add_final_judgement_to_quotes(quotes: List[dict], final_amount: float) -> List[dict]:
-    for quote in quotes:
-        quote["final_judgement_real"] = final_amount
-    return quotes
+# In case_otcome_impter.py
+def add_final_jdgement_to_qotes(qotes: List[dict], final_amont: float) -> List[dict]:
+    for qote in qotes:
+        qote["final_jdgement_real"] = final_amont
+    retrn qotes
 ```
 
 ---
 
 ## 🧪 **Testing & Validation**
 
-### **Comprehensive Test Suite**
+### **Comprehensive Test Site**
 ```bash
-# Run all scraper tests
-python packages/corpus-hydrator/scripts/test_wikipedia_scraper.py
+# Rn all scraper tests
+python packages/corps-hydrator/scripts/test_wikipedia_scraper.py
 
-# Run with pytest
-pytest packages/corpus-hydrator/tests/test_wikipedia_scraper.py -v
+# Rn with pytest
+pytest packages/corps-hydrator/tests/test_wikipedia_scraper.py -v
 
-# Test configuration validation
-pytest packages/corpus-hydrator/tests/test_wikipedia_scraper.py::TestWikipediaScraper::test_configuration
+# Test configration validation
+pytest packages/corps-hydrator/tests/test_wikipedia_scraper.py::TestWikipediaScraper::test_configration
 ```
 
 ### **Test Coverage**
-- ✅ Configuration validation
+- ✅ Configration validation
 - ✅ Data model creation and validation
-- ✅ Rate limiting functionality
-- ✅ Index scraping (dry run mode)
-- ✅ Error handling and fallbacks
-- ✅ Output format validation
+- ✅ Rate limiting fnctionality
+- ✅ Index scraping (dry rn mode)
+- ✅ rror handling and fallbacks
+- ✅ Otpt format validation
 
 ---
 
 ## 📈 **Performance & Scalability**
 
 ### **Rate Limiting**
-- **Wikipedia**: 1 req/sec (configurable)
-- **SEC EDGAR**: 10 req/sec (configurable)
-- **Automatic backoff** on failures
+- **Wikipedia**:  req/sec (configrable)
+- **SC DGAR**:  req/sec (configrable)
+- **Atomatic backoff** on failres
 - **Connection pooling** for efficiency
 
 ### **Parallel Processing**
-- **Company scraping**: Parallel execution with configurable workers
-- **Batch processing**: Configurable batch sizes for large indices
+- **Company scraping**: Parallel exection with configrable workers
+- **atch processing**: Configrable batch sizes for large indices
 - **Memory efficient**: Streaming processing for large datasets
 
 ---
 
-## 🎯 **Extensibility for Other Indices**
+## 🎯 **xtensibility for Other Indices**
 
 ### **Adding New Indices (No Code Changes)**
 ```yaml
 indices:
-  custom_index:
-    name: "Custom Technology Index"
-    short_name: "custom_tech"
-    wikipedia_url: "https://en.wikipedia.org/wiki/List_of_technology_companies"
+  cstom_index:
+    name: "Cstom Technology Index"
+    short_name: "cstom_tech"
+    wikipedia_rl: "https://en.wikipedia.org/wiki/List_of_technology_companies"
     table_id: "companies"
-    ticker_column: 0
-    name_column: 1
-    cik_column: 2
-    max_companies: 50
+    ticker_colmn: 
+    name_colmn: 
+    cik_colmn: 
+    max_companies: 
 ```
 
 ### **Command Usage**
 ```bash
-# Automatically works with new index
-hydrator fetch wikipedia --index custom_tech --output-dir data/
+# Atomatically works with new index
+hydrator fetch wikipedia --index cstom_tech --otpt-dir data/
 ```
 
 ---
 
-## 🔒 **Robustness Features**
+## 🔒 **Robstness eatres**
 
-### **Error Handling**
-- ✅ Network failure retries with exponential backoff
+### **rror Handling**
+- ✅ Network failre retries with exponential backoff
 - ✅ Missing data fallback strategies
 - ✅ HTML parsing error handling
-- ✅ Rate limit automatic management
+- ✅ Rate limit atomatic management
 
 ### **Data Validation**
-- ✅ CIK format validation (10 digits)
-- ✅ Ticker format validation (1-5 uppercase letters)
+- ✅ CIK format validation ( digits)
+- ✅ Ticker format validation (- ppercase letters)
 - ✅ Company name length validation
-- ✅ Duplicate detection and merging
+- ✅ Dplicate detection and merging
 
-### **Monitoring & Debugging**
+### **Monitoring & Debgging**
 - ✅ Comprehensive logging at all levels
-- ✅ Dry run mode for testing
+- ✅ Dry rn mode for testing
 - ✅ Progress tracking for long operations
 - ✅ Detailed error reporting
 
 ---
 
-## 📋 **Output Files Generated**
+## 📋 **Otpt iles Generated**
 
-### **1. Base Company List** (`{index}_aliases.csv`)
+### **. ase Company List** (`index_aliases.csv`)
 ```csv
-ticker,official_name,cik,wikipedia_url,index_name
-AAPL,Apple Inc.,0000320193,https://en.wikipedia.org/wiki/Apple_Inc.,sp500
+ticker,official_name,cik,wikipedia_rl,index_name
+AAPL,Apple Inc.,9,https://en.wikipedia.org/wiki/Apple_Inc.,sp
 ```
 
-### **2. Wide Format Executives** (`{index}_aliases_enriched.csv`)
+### **. Wide ormat xectives** (`index_aliases_enriched.csv`)
 ```csv
-ticker,official_name,cik,exec1,exec2,exec3,...
-AAPL,Apple Inc.,0000320193,Tim Cook (CEO),Luca Maestri (CFO),...
+ticker,official_name,cik,exec,exec,exec,...
+AAPL,Apple Inc.,9,Tim Cook (CO),Lca Maestri (CO),...
 ```
 
-### **3. Long Format Executives** (`{index}_officers_cleaned.csv`)
+### **. Long ormat xectives** (`index_officers_cleaned.csv`)
 ```csv
-ticker,official_name,cik,name,title,source,scraped_at
-AAPL,Apple Inc.,0000320193,Tim Cook,CEO,wikipedia,2024-01-01T10:00:00
+ticker,official_name,cik,name,title,sorce,scraped_at
+AAPL,Apple Inc.,9,Tim Cook,CO,wikipedia,--T::
 ```
 
 ---
 
-## 🚀 **Ready for Production**
+## 🚀 **Ready for Prodction**
 
 The Wikipedia scraper system is now:
 
-- ✅ **Fully integrated** with the existing corpus pipeline
-- ✅ **Schema-driven** with authoritative configuration
-- ✅ **Extensible** to any Wikipedia-based market index
-- ✅ **Testable** with comprehensive test suite
-- ✅ **Robust** with error handling and rate limiting
+- ✅ **lly integrated** with the existing corps pipeline
+- ✅ **Schema-driven** with athoritative configration
+- ✅ **xtensible** to any Wikipedia-based market index
+- ✅ **Testable** with comprehensive test site
+- ✅ **Robst** with error handling and rate limiting
 - ✅ **Performant** with parallel processing and connection pooling
-- ✅ **Well-documented** with usage examples and configuration guides
+- ✅ **Well-docmented** with sage examples and configration gides
 
 ### **Next Steps**
-1. **Test with real data**: Run `hydrator fetch wikipedia --index sp500 --max-companies 5 --dry-run`
-2. **Validate outputs**: Check generated CSV files match expected schemas
-3. **Scale up**: Remove `--max-companies` limit for full index scraping
-4. **Monitor performance**: Adjust rate limits based on real-world usage
+. **Test with real data**: Rn `hydrator fetch wikipedia --index sp --max-companies  --dry-rn`
+. **Validate otpts**: Check generated CSV files match expected schemas
+. **Scale p**: Remove `--max-companies` limit for fll index scraping
+. **Monitor performance**: Adjst rate limits based on real-world sage
 
-The system is production-ready and provides a solid foundation for extracting corporate executive data from Wikipedia and SEC sources! 🎉
+The system is prodction-ready and provides a solid fondation for extracting corporate exective data from Wikipedia and SC sorces! 🎉

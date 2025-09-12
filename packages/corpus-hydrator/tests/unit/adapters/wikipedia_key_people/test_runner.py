@@ -44,18 +44,18 @@ def run_tests():
         print("=" * 50)
 
         if result.returncode == 0:
-            print("✅ All tests passed!")
+            print("All tests passed!")
         else:
-            print("❌ Some tests failed!")
+            print("Some tests failed!")
             print(f"Exit code: {result.returncode}")
 
         return result.returncode
 
     except KeyboardInterrupt:
-        print("\n⚠️  Tests interrupted by user")
+        print("\nTests interrupted by user")
         return 1
     except Exception as e:
-        print(f"\n❌ Error running tests: {e}")
+        print(f"\nError running tests: {e}")
         return 1
 
 def run_specific_test(test_file):
@@ -67,7 +67,7 @@ def run_specific_test(test_file):
 
     test_path = test_dir / test_file
     if not test_path.exists():
-        print(f"❌ Test file not found: {test_file}")
+        print(f"Test file not found: {test_file}")
         return 1
 
     cmd = [
@@ -100,12 +100,12 @@ def show_test_coverage():
             "-v"
         ]
 
-        print("📊 Running tests with coverage...")
+        print("Running tests with coverage...")
         result = subprocess.run(cmd, capture_output=False, text=True)
         return result.returncode
 
     except ImportError:
-        print("⚠️  pytest-cov not available, running without coverage")
+        print("pytest-cov not available, running without coverage")
         return run_tests()
 
 def main():

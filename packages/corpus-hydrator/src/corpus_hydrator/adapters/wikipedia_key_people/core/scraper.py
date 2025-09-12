@@ -482,10 +482,10 @@ class WikipediaKeyPeopleScraper:
                                 logger.info(f"✓ {company.ticker}: {len(key_people)} key people")
                             else:
                                 company.processing_success = False
-                                logger.warning(f"✗ {company.ticker}: No key people found")
+                                logger.warning(f"No key people found for {company.ticker}")
                         except Exception as e:
                             company.processing_success = False
-                            logger.error(f"✗ {company.ticker}: Error - {e}")
+                            logger.error(f"Error processing {company.ticker}: {e}")
 
             # Step 4: Update result object
             result.companies = companies

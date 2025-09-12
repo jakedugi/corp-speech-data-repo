@@ -139,28 +139,28 @@ def scrape_index_normalized(
         )
 
         if "error" in result:
-            typer.echo(f"❌ Error: {result['error']}", err=True)
+            typer.echo(f"Error: {result['error']}", err=True)
             raise typer.Exit(1)
 
         # Display results
-        typer.echo("✅ Normalized extraction completed!")
-        typer.echo(f"📊 Index: {result['index_name']}")
-        typer.echo(f"🏢 Companies processed: {result['companies_processed']}")
-        typer.echo(f"✅ Companies successful: {result['companies_successful']}")
-        typer.echo(f"👥 People extracted: {result['people_extracted']}")
-        typer.echo(f"🎭 Roles identified: {result['roles_identified']}")
-        typer.echo(f"🔗 Appointments created: {result['appointments_created']}")
+        typer.echo("Normalized extraction completed!")
+        typer.echo(f"Index: {result['index_name']}")
+        typer.echo(f"Companies processed: {result['companies_processed']}")
+        typer.echo(f"Companies successful: {result['companies_successful']}")
+        typer.echo(f"People extracted: {result['people_extracted']}")
+        typer.echo(f"Roles identified: {result['roles_identified']}")
+        typer.echo(f"Appointments created: {result['appointments_created']}")
 
-        typer.echo("\n📁 Output files:")
+        typer.echo("\nOutput files:")
         for file in result['output_files']:
             typer.echo(f"  • {output_dir}/{file}")
 
-        typer.echo("\n📋 Manifest:")
+        typer.echo("\nManifest:")
         typer.echo(f"  Schema version: {result['manifest']['schema_version']}")
         typer.echo(f"  License: {result['manifest']['governance']['license']}")
 
     except Exception as e:
-        typer.echo(f"❌ Extraction failed: {e}", err=True)
+        typer.echo(f"Extraction failed: {e}", err=True)
         if verbose:
             import traceback
             typer.echo(traceback.format_exc(), err=True)
@@ -223,7 +223,7 @@ def scrape_index(
         # Create and run scraper
         scraper = WikipediaKeyPeopleScraper(config)
 
-        print("🚀 Wikipedia Key People Scraper")
+        print("Wikipedia Key People Scraper")
         print("=" * 50)
         print(f"Index: {index}")
         print(f"Output: {output_dir}")
@@ -236,14 +236,14 @@ def scrape_index(
         result = scraper.scrape_index(index)
 
         if not result.success:
-            print(f"❌ Extraction failed: {result.error_message}")
+            print(f"Extraction failed: {result.error_message}")
             sys.exit(1)
 
         # Save results
         _save_results(result, output_dir)
 
         # Print summary
-        print("\n✅ Extraction Complete!")
+        print("\nExtraction Complete!")
         print(f"Companies processed: {result.companies_processed}")
         print(f"Companies successful: {result.companies_successful}")
         print(f"Total key people: {result.total_key_people}")
@@ -255,14 +255,14 @@ def scrape_index(
                 company_counts[f"{company.ticker} ({company.company_name})"] = company.key_people_count
 
         if company_counts:
-            print("\n🏆 Top companies by key people count:")
+            print("\nTop companies by key people count:")
             for company_name, count in sorted(company_counts.items(), key=lambda x: x[1], reverse=True)[:5]:
                 print(f"  • {company_name}: {count} people")
 
-        print(f"\n📁 Results saved to: {output_dir}")
+        print(f"\nResults saved to: {output_dir}")
 
     except Exception as e:
-        logger.error(f"❌ Error: {e}")
+        logger.error(f"Error: {e}")
         if verbose:
             import traceback
             traceback.print_exc()
@@ -319,7 +319,7 @@ def scrape_multiple(
         # Create and run scraper
         scraper = WikipediaKeyPeopleScraper(config)
 
-        print("🚀 Wikipedia Key People Scraper - Multiple Indices")
+        print("Wikipedia Key People Scraper - Multiple Indices")
         print("=" * 60)
         print(f"Indices: {', '.join(indices)}")
         print(f"Output: {output_dir}")
@@ -343,19 +343,19 @@ def scrape_multiple(
                 total_successful += result.companies_successful
                 total_people += result.total_key_people
 
-                print(f"✅ {index_name}: {result.companies_successful}/{result.companies_processed} companies, {result.total_key_people} people")
+                print(f"{index_name}: {result.companies_successful}/{result.companies_processed} companies, {result.total_key_people} people")
             else:
-                print(f"❌ {index_name}: Failed - {result.error_message}")
+                print(f"{index_name}: Failed - {result.error_message}")
 
-        print("\n🎉 All Extractions Complete!")
+        print("\nAll Extractions Complete!")
         print(f"Total companies processed: {total_companies}")
         print(f"Total companies successful: {total_successful}")
         print(f"Total key people extracted: {total_people}")
         print(f"Average key people per company: {total_people/total_successful:.1f}" if total_successful > 0 else "No successful companies")
-        print(f"\n📁 Results saved to: {output_dir}")
+        print(f"\nResults saved to: {output_dir}")
 
     except Exception as e:
-        logger.error(f"❌ Error: {e}")
+        logger.error(f"Error: {e}")
         if verbose:
             import traceback
             traceback.print_exc()
