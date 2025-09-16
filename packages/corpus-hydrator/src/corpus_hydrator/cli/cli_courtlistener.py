@@ -15,20 +15,28 @@ from loguru import logger
 import httpx
 from dotenv import load_dotenv
 
-from corp_speech_risk_dataset.api.adapters.courtlistener.queries import STATUTE_QUERIES
-from corpus_api.config.courtlistener_config import load_config
-from corpus_api.orchestrators.courtlistener_orchestrator import (
-    CourtListenerOrchestrator,
-)
-from corp_speech_risk_dataset.workflows.legacy_multistep import (
-    LegacyCourtListenerWorkflow,
-)
-from corp_speech_risk_dataset.shared.logging_utils import setup_logging
+# Import from the new unified CourtListener adapter
+from ..adapters.courtlistener.parsers.query_builder import STATUTE_QUERIES
+from ..adapters.courtlistener.config import get_default_config
+from ..adapters.courtlistener.usecase import CourtListenerUseCase
+# Processor functions removed - simplified CLI only uses orchestrate and search
+
+# Legacy workflow imports (commented out until fixed)
+# from ..workflows.legacy_multistep import LegacyCourtListenerWorkflow
+# from ..shared.logging_utils import setup_logging
 
 load_dotenv()  # Load environment variables from .env if present
 
 # Set up logging to logs/pipeline.log with rotation and INFO level
-setup_logging(log_file=Path("logs/pipeline.log"), level="INFO", rotation="1 day")
+import logging
+logging.basicConfig(
+    level=logging.INFO,
+    format="%(asctime)s - %(levelname)s - %(message)s",
+    handlers=[
+        logging.FileHandler("logs/pipeline.log"),
+        logging.StreamHandler()
+    ]
+)
 
 app = typer.Typer(help="CourtListener batch search CLI")
 
@@ -95,11 +103,11 @@ def orchestrate(
         readable=True,
         help="CSV with company names (column 'official_name')",
     ),
-    outdir: Path = typer.Option(
-        Path("CourtListener"),
+    outdir: Optional[Path] = typer.Option(
+        None,
         "--outdir",
         "-o",
-        help="Base output directory",
+        help="Base output directory (auto-generated for test mode)",
     ),
     pages: int = typer.Option(
         1, "--pages", "-p", min=1, help="Pages per search request"
@@ -134,11 +142,47 @@ def orchestrate(
         "--async/--no-async",
         help="Run document fetching in parallel using asyncio (default: False)",
     ),
+    max_companies: Optional[int] = typer.Option(
+        None,
+        "--max-companies",
+        help="Limit number of companies to process for quick testing (default: all)",
+    ),
+    max_results: Optional[int] = typer.Option(
+        None,
+        "--max-results",
+        help="Limit total results per query for quick testing (default: no limit)",
+    ),
+    test_mode: bool = typer.Option(
+        False,
+        "--test-mode",
+        help="Test mode: Sets max-cases to 2 for testing",
+    ),
+    max_cases: int = typer.Option(
+        None,
+        "--max-cases",
+        help="Maximum total cases to process and fully hydrate (overrides all other limits)",
+    ),
 ):
-    """Run the full multi-step CourtListener workflow in one go. Use --async for parallel doc fetching."""
-    from corp_speech_risk_dataset.api.adapters.courtlistener.queries import (
-        build_queries,
-    )
+    """Run the CourtListener workflow: search → hydrate dockets with all related data.
+
+    MODES:
+    - Base mode: Processes all companies from index with full pagination
+    - Test mode (--test-mode): Auto-creates timestamped directory, max 2 cases
+    - Custom limit (--max-cases=N): Processes exactly N cases total
+
+    FEATURES:
+    - Test mode auto-creates output directory (e.g., test-courtlistener_20240915_143022)
+    - Creates directories only when data is actually found
+    - 429 errors skip immediately without retries
+    - Parallel processing for maximum speed
+    - Strict case limits override all other settings
+
+    PDF DOWNLOADS:
+    - PDFs require PACER credentials (set PACER_USER and PACER_PASS)
+    - Most RECAP documents are behind paywalls and not freely available
+    - Disable PDF downloads: export COURTLISTENER_DISABLE_PDF_DOWNLOADS=true
+    """
+    from ..adapters.courtlistener.parsers.query_builder import build_queries
 
     if print_query_chunks:
         if not statutes or not company_file:
@@ -154,28 +198,65 @@ def orchestrate(
             print(f"  Companies: {company_count}")
             print(f"  Query chunks: {len(queries)} (chunk size: {chunk_size})")
         sys.exit(0)
-    config = load_config()
-    token = token or os.getenv("COURTLISTENER_API_TOKEN")
+    config = get_default_config()
+    if token:
+        config.api_token = token
+
+    # Handle test mode output directory
+    if test_mode and not outdir:
+        # Auto-generate test output directory with timestamp
+        import datetime
+        timestamp = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
+        outdir = f"test-courtlistener_{timestamp}"
+        logger.info(f"🧪 TEST MODE: Auto-created output directory: {outdir}")
+
+    # Handle test mode
+    if test_mode and max_cases is None:
+        max_cases = 2  # Test mode defaults to 2 cases
+
+    # Configuration based on mode
+    if max_cases is not None and max_cases <= 5:
+        # Strict case limit mode (test mode or manual override)
+        max_companies = 1
+        max_results = max_cases
+        page_size = max_cases
+        pages = 1
+        if test_mode:
+            logger.info(f"🧪 TEST MODE: Max {max_cases} cases in {outdir}")
+        else:
+            logger.info(f"🎯 STRICT LIMIT MODE: Max {max_cases} total cases")
+    elif test_mode:
+        # Test mode without strict limit
+        max_companies = 1
+        max_results = 10  # Allow more results per query
+        page_size = 10
+        pages = 1
+        logger.info(f"🧪 TEST MODE: 1 company, 1 page in {outdir}")
+    else:
+        # Base mode: All companies with full pagination
+        max_companies = None  # Process all companies
+        max_results = None    # No limit on results per query
+        page_size = 50        # Standard page size for production
+        pages = None          # Let pagination handle all pages
+        logger.info("📊 BASE MODE: All companies with full pagination")
+
     try:
-        orchestrator = CourtListenerOrchestrator(
+        usecase = CourtListenerUseCase(
             config=config,
-            statutes=statutes,  # may be None (means "all")
+            statutes=statutes or ["FTC Section 5"],
             company_file=company_file,
-            outdir=outdir,
+            outdir=str(outdir) if outdir else "CourtListener",
             token=token,
             pages=pages,
             page_size=page_size,
             date_min=date_min,
             api_mode=api_mode,
-            chunk_size=chunk_size,
-            async_mode=async_mode,
+            chunk_size=1 if test_mode else 10,  # 1 company per chunk for test, 10 for base
+            max_companies=max_companies,
+            max_results=max_results,
+            max_cases=max_cases,
         )
-        if async_mode:
-            import asyncio
-
-            asyncio.run(orchestrator.run_async())
-        else:
-            orchestrator.run()
+        usecase.run()
     except Exception:
         logger.exception("Fatal error during orchestration")
         raise typer.Exit(code=1)
@@ -185,12 +266,15 @@ def orchestrate(
 def legacy(
     query: List[str] = typer.Argument(..., help="One or more raw search strings"),
     court: str = typer.Option(None, "--court", "-c", help="Override court id"),
-    outdir: Path = typer.Option("CourtListener", "--outdir", "-o"),
+    outdir: Optional[Path] = typer.Option(None, "--outdir", "-o"),
 ):
     """
     Run the original 7-step multi-call workflow verbatim.
+    Note: Legacy workflow not currently implemented in unified structure.
     """
-    LegacyCourtListenerWorkflow(query, court, outdir).run()
+    logger.warning("Legacy workflow not currently implemented in unified structure.")
+    logger.info("Use the 'orchestrate' command for the new unified workflow.")
+    raise typer.Exit(1)
 
 
 @app.command()
@@ -234,7 +318,7 @@ def search(
 ):
     """Run batch searches for specified statutes."""
     # Load configuration
-    config = load_config()
+    config = get_default_config()
 
     # Validate statutes
     invalid_statutes = [s for s in statutes if s not in STATUTE_QUERIES]
@@ -265,306 +349,12 @@ def search(
         raise typer.Exit(1)
 
 
-@app.command()
-def recap(
-    query: Optional[str] = typer.Option(
-        None, "--query", "-q", help="Search query for RECAP data"
-    ),
-    docket_id: Optional[int] = typer.Option(
-        None, "--docket-id", "-d", help="Specific docket ID to fetch"
-    ),
-    pages: int = typer.Option(1, "--pages", "-p", help="Number of pages to fetch"),
-    page_size: int = typer.Option(50, "--page-size", help="Results per page (max 100)"),
-    output_dir: Optional[Path] = typer.Option(
-        None,
-        "--output-dir",
-        "-o",
-        help="Output directory (default: data/raw/courtlistener/recap)",
-    ),
-):
-    """Fetch RECAP data from CourtListener."""
-    # Load configuration
-    config = load_config()
-
-    # Run RECAP data processing
-    try:
-        process_recap_data(
-            config=config,
-            query=query,
-            docket_id=docket_id,
-            pages=pages,
-            page_size=page_size,
-            output_dir=output_dir,
-        )
-    except Exception as e:
-        logger.exception("Error during RECAP data processing")
-        raise typer.Exit(1)
-
-
-@app.command()
-def docket_entries(
-    docket_id: Optional[int] = typer.Option(
-        None, "--docket-id", "-d", help="Specific docket ID to fetch entries for"
-    ),
-    query: Optional[str] = typer.Option(
-        None, "--query", "-q", help="Search query for docket entries"
-    ),
-    order_by: str = typer.Option(
-        "-date_filed",
-        "--order-by",
-        help="Field to order by (e.g., date_filed, -date_filed, entry_number)",
-    ),
-    pages: int = typer.Option(1, "--pages", "-p", help="Number of pages to fetch"),
-    page_size: int = typer.Option(
-        20,
-        "--page-size",
-        help="Results per page (max 20 recommended due to nested docs)",
-    ),
-    output_dir: Optional[Path] = typer.Option(
-        None, "--output-dir", "-o", help="Output directory"
-    ),
-    api_mode: str = typer.Option(
-        "standard", "--api-mode", "-m", help="API mode to use (standard or recap)"
-    ),
-):
-    """Fetch docket entries with nested RECAP documents."""
-    # Load configuration
-    config = load_config()
-
-    # Validate API mode
-    if api_mode not in ["standard", "recap"]:
-        logger.error(f"Invalid API mode: {api_mode}. Must be 'standard' or 'recap'")
-        raise typer.Exit(1)
-
-    # Run docket entries processing
-    try:
-        process_docket_entries(
-            config=config,
-            docket_id=docket_id,
-            query=query,
-            order_by=order_by,
-            pages=pages,
-            page_size=page_size,
-            output_dir=output_dir,
-            api_mode=api_mode,
-        )
-    except Exception as e:
-        logger.exception("Error during docket entries processing")
-        raise typer.Exit(1)
-
-
-@app.command()
-def documents(
-    docket_id: Optional[int] = typer.Option(
-        None, "--docket-id", "-d", help="Docket ID to fetch all documents for"
-    ),
-    docket_entry_id: Optional[int] = typer.Option(
-        None, "--entry-id", "-e", help="Specific docket entry ID to fetch documents for"
-    ),
-    query: Optional[str] = typer.Option(
-        None, "--query", "-q", help="Search query for RECAP documents"
-    ),
-    order_by: str = typer.Option(
-        "-date_created",
-        "--order-by",
-        help="Field to order by (e.g., date_created, -date_created)",
-    ),
-    pages: int = typer.Option(1, "--pages", "-p", help="Number of pages to fetch"),
-    page_size: int = typer.Option(100, "--page-size", help="Results per page"),
-    include_text: bool = typer.Option(
-        True, "--include-text", help="Include plain text content (can be large)"
-    ),
-    output_dir: Optional[Path] = typer.Option(
-        None, "--output-dir", "-o", help="Output directory"
-    ),
-    api_mode: str = typer.Option(
-        "standard", "--api-mode", "-m", help="API mode to use (standard or recap)"
-    ),
-):
-    """Fetch RECAP documents with full text content."""
-    # Load configuration
-    config = load_config()
-
-    # Validate API mode
-    if api_mode not in ["standard", "recap"]:
-        logger.error(f"Invalid API mode: {api_mode}. Must be 'standard' or 'recap'")
-        raise typer.Exit(1)
-
-    # Run RECAP documents processing
-    try:
-        process_recap_documents(
-            config=config,
-            docket_id=docket_id,
-            docket_entry_id=docket_entry_id,
-            query=query,
-            order_by=order_by,
-            pages=pages,
-            page_size=page_size,
-            include_plain_text=include_text,
-            output_dir=output_dir,
-            api_mode=api_mode,
-        )
-    except Exception as e:
-        logger.exception("Error during RECAP documents processing")
-        raise typer.Exit(1)
-
-
-@app.command()
-def full_docket(
-    docket_id: int = typer.Argument(..., help="The docket ID to fetch"),
-    include_documents: bool = typer.Option(
-        True, "--include-documents", help="Include full document text"
-    ),
-    order_by: str = typer.Option(
-        "-date_filed", "--order-by", help="How to order docket entries"
-    ),
-    output_dir: Optional[Path] = typer.Option(
-        None, "--output-dir", "-o", help="Output directory"
-    ),
-    api_mode: str = typer.Option(
-        "standard", "--api-mode", "-m", help="API mode to use (standard or recap)"
-    ),
-):
-    """Fetch a complete docket with all entries and documents."""
-    # Load configuration
-    config = load_config()
-
-    # Validate API mode
-    if api_mode not in ["standard", "recap"]:
-        logger.error(f"Invalid API mode: {api_mode}. Must be 'standard' or 'recap'")
-        raise typer.Exit(1)
-
-    # Run full docket processing
-    try:
-        process_full_docket(
-            config=config,
-            docket_id=docket_id,
-            include_documents=include_documents,
-            order_by=order_by,
-            output_dir=output_dir,
-            api_mode=api_mode,
-        )
-    except Exception as e:
-        logger.exception("Error during full docket processing")
-        raise typer.Exit(1)
-
-
-@app.command()
-def fetch(
-    resource_type: str = typer.Argument(
-        ..., help="Resource type (opinions, dockets, docket_entries, recap_docs, recap)"
-    ),
-    output_dir: str = typer.Option("data/", help="Output directory"),
-    param: List[str] = typer.Option(None, help="Query params as key=value"),
-    limit: int = typer.Option(
-        10, help="Maximum number of results to save (default: 10)"
-    ),
-    show_fields: bool = typer.Option(
-        False, help="Show available fields for the resource type and exit"
-    ),
-):
-    """Fetch any resource from CourtListener."""
-    from corp_speech_risk_dataset.api.adapters.courtlistener import CourtListenerClient
-    from corp_speech_risk_dataset.config import load_config
-    import json
-
-    if show_fields:
-        fields = RESOURCE_FIELDS.get(resource_type)
-        if fields:
-            print(f"Available fields for {resource_type}:\n  " + ", ".join(fields))
-        else:
-            print(f"No field info for resource type: {resource_type}")
-        raise typer.Exit(0)
-
-    params = dict(p.split("=", 1) for p in param) if param else {}
-    config = load_config()
-    client = CourtListenerClient(config)
-    try:
-        results = client.fetch_resource(resource_type, params, limit=limit)
-    except httpx.HTTPStatusError as e:
-        print(
-            f"HTTP error: {e.response.status_code} {e.response.reason_phrase}\nURL: {e.request.url}\nMessage: {e.response.text}"
-        )
-        raise typer.Exit(1)
-    except Exception as e:
-        print(f"Error: {e}")
-        raise typer.Exit(1)
-    outdir = Path(output_dir) / resource_type
-    outdir.mkdir(parents=True, exist_ok=True)
-    for i, item in enumerate(results):
-        with open(outdir / f"{resource_type}_{i}.json", "w") as f:
-            json.dump(item, f, indent=2)
-    print(f"Saved {len(results)} {resource_type} to {outdir}")
-
-
-@app.command()
-def search_api(
-    param: List[str] = typer.Option(
-        None, help="Query params as key=value, e.g. q=foo type=o order_by=dateFiled"
-    ),
-    output_dir: Path = typer.Option(
-        None, help="Optional output directory to save results as JSON"
-    ),
-    limit: int = typer.Option(
-        None, help="Limit number of results (client-side, not API param)"
-    ),
-    show_url: bool = typer.Option(False, help="Print the full API URL used and exit"),
-    token: Optional[str] = typer.Option(
-        None, help="CourtListener API token (overrides config if set)"
-    ),
-):
-    """Directly query the /api/rest/v4/search/ endpoint with arbitrary parameters."""
-    # Load configuration
-    config = load_config()
-    params = dict(p.split("=", 1) for p in param) if param else {}
-    try:
-        process_search_api(
-            config=config,
-            params=params,
-            output_dir=output_dir,
-            limit=limit,
-            show_url=show_url,
-            token=token,
-        )
-    except Exception as e:
-        logger.exception("Error during search API processing")
-        raise typer.Exit(1)
-
-
-@app.command()
-def recap_fetch(
-    post_param: List[str] = typer.Option(
-        None,
-        help="POST params as key=value, e.g. request_type=1 docket_number=5:16-cv-00432 court=okwd",
-    ),
-    show_url: bool = typer.Option(
-        False, help="Print the POST URL and data, do not send request"
-    ),
-    token: Optional[str] = typer.Option(
-        None, help="CourtListener API token (overrides config if set)"
-    ),
-):
-    """[TEST/FALLBACK] POST to /api/rest/v4/recap-fetch/ to trigger a PACER fetch. Will not actually purchase anything."""
-    config = load_config()
-    post_data = dict(p.split("=", 1) for p in post_param) if post_param else {}
-    try:
-        process_recap_fetch(
-            config=config, post_data=post_data, show_url=show_url, token=token
-        )
-    except Exception as e:
-        logger.exception("Error during recap-fetch POST")
-        raise typer.Exit(1)
-
-
 def main():
     """Main entry point for the CLI."""
-    import sys
-    from loguru import logger
-
-    logger.remove()
-    logger.add(sys.stderr, level="DEBUG", colorize=True)
     app()
 
 
 if __name__ == "__main__":
     main()
+
+

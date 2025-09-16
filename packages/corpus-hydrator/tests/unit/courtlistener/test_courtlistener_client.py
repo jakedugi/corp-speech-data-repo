@@ -6,8 +6,8 @@ from unittest.mock import patch, MagicMock
 
 import pytest
 
-from corp_speech_risk_dataset.api.adapters.courtlistener import CourtListenerClient
-from corp_speech_risk_dataset.custom_types.base_types import APIConfig
+from corpus_hydrator.adapters.courtlistener.providers.client import CourtListenerClient
+from corpus_types.schemas.models import CourtListenerConfig
 
 
 @pytest.fixture
@@ -24,7 +24,7 @@ def mock_response():
 @pytest.fixture
 def client():
     """Create a test client."""
-    config = APIConfig(api_key="test_token")
+    config = CourtListenerConfig(api_token="test_token")
     return CourtListenerClient(config)
 
 

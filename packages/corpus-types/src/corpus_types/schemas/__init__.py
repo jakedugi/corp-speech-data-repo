@@ -36,6 +36,7 @@ from .models import (
 
     # Configuration types
     APIConfig,
+    CourtListenerConfig,
 
     # Document types
     Doc,
@@ -106,6 +107,7 @@ __all__ = [
 
     # Configuration types
     "APIConfig",
+    "CourtListenerConfig",
     "LegacyAPIConfig",
 
     # Document types

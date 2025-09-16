@@ -1,7 +1,8 @@
 """
-CourtListener HTTP/JSON client (modularized).
+CourtListener HTTP/JSON client with sophisticated error handling and acceleration.
 
-This module will contain only the low-level HTTP/JSON client logic for CourtListener.
+This module contains the low-level HTTP/JSON client logic for CourtListener API
+with robust retry mechanisms, rate limiting, and async parallelization.
 """
 
 from __future__ import annotations
@@ -15,13 +16,17 @@ import random
 from asyncio import Semaphore
 from httpx import AsyncClient, Limits, AsyncHTTPTransport
 
-from corpus_api.client.base_api_client import BaseAPIClient
-from corpus_types.schemas.models import APIConfig
-# TODO: Implement http_utils or use requests directly
-# from corpus_api.infrastructure.http_utils import (
-#     safe_sync_get,
-#     safe_async_get,
-# )
+from corpus_types.schemas import CourtListenerConfig
+from ..utils.http_utils import safe_sync_get, safe_async_get
+
+
+class BaseAPIClient:
+    """Simple base API client class."""
+
+    def __init__(self, config):
+        """Initialize with config."""
+        self.config = config
+
 
 # API endpoint configurations
 API_ENDPOINTS = {
@@ -46,12 +51,12 @@ API_ENDPOINTS = {
 
 
 class CourtListenerClient(BaseAPIClient):
-    """Client for interacting with the CourtListener API."""
+    """Client for interacting with the CourtListener API with sophisticated error handling."""
 
     BASE_URL = "https://www.courtlistener.com/api/rest/v4"
     BASE_OPINIONS_URL = f"{BASE_URL}/opinions/"
 
-    def __init__(self, config: APIConfig, api_mode: str = "standard"):
+    def __init__(self, config: CourtListenerConfig, api_mode: str = "standard"):
         """Initialize the client with API configuration.
 
         Args:
@@ -82,6 +87,7 @@ class CourtListenerClient(BaseAPIClient):
         }
 
     def _get(self, url: str, params: Optional[Dict[str, Any]] = None) -> Dict[str, Any]:
+        """Perform a GET request with sophisticated error handling."""
         result = safe_sync_get(
             session=self._session,
             url=url,
@@ -134,7 +140,7 @@ class AsyncCourtListenerClient:
     Uses HTTPX's built-in AsyncHTTPTransport for automatic retries.
     """
 
-    def __init__(self, token: str, max_concurrency: int = 2, rate_limit: float = 3.0):
+    def __init__(self, token: str, max_concurrency: int = 2, rate_limit: float = 3.0, api_mode: str = "standard"):
         # Use HTTPX built-in AsyncHTTPTransport with retries
         transport = AsyncHTTPTransport(retries=5)
         self.client = AsyncClient(
@@ -145,6 +151,7 @@ class AsyncCourtListenerClient:
         )
         self.sem = asyncio.Semaphore(max_concurrency)
         self.rate_limit = rate_limit
+        self.api_mode = api_mode
 
     async def _get(self, url, params=None, retries=5):
         data = await safe_async_get(
@@ -163,3 +170,38 @@ class AsyncCourtListenerClient:
         """
         tasks = [self._get(uri) for uri in doc_uris]
         return await asyncio.gather(*tasks, return_exceptions=True)
+
+    async def fetch_resource_async(self, resource_type: str, params: dict = None, limit: int = None):
+        """
+        Fetch any resource from CourtListener asynchronously by type, with optional result limit.
+        Uses API's next-link for pagination; never manually increments page numbers.
+        Only the first request uses params; subsequent requests follow the 'next' URL.
+        If a 404 is encountered (e.g., due to deep pagination), stops gracefully.
+        """
+        endpoint = API_ENDPOINTS.get(self.api_mode, API_ENDPOINTS["standard"]).get(resource_type)
+        if not endpoint:
+            raise ValueError(f"Unknown resource type: {resource_type}")
+
+        url = endpoint
+        results = []
+
+        while url:
+            try:
+                data = await self._get(url, params)
+            except Exception as e:
+                logger.warning(f"Error fetching {resource_type}: {e}")
+                break
+
+            batch = data.get("results", [])
+            if limit is not None and len(results) + len(batch) > limit:
+                results.extend(batch[: limit - len(results)])
+                break
+            results.extend(batch)
+
+            if limit is not None and len(results) >= limit:
+                break
+
+            url = data.get("next")
+            params = None  # Only use params on first request
+
+        return results

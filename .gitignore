@@ -150,8 +150,8 @@ dmypy.json
 
 # Data files (uncomment as needed)
 # *.csv
-# *.json
-# *.jsonl
+*.json
+*.jsonl
 # *.parquet
 # *.feather
 # *.pkl
@@ -160,6 +160,7 @@ dmypy.json
 # *.hdf5
 # *.npy
 # *.npz
+*.txt
 
 # Model files
 *.pth

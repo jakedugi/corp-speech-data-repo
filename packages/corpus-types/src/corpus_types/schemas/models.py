@@ -10,6 +10,7 @@ from __future__ import annotations
 
 import re
 from datetime import datetime
+from pathlib import Path
 from typing import Dict, List, Optional, Tuple, Any, Literal, Union
 from pydantic import BaseModel, Field, validator, ConfigDict
 
@@ -211,6 +212,52 @@ class APIConfig(ExtensibleBase):
     def api_key(self) -> Optional[str]:
         """Alias for api_token for backward compatibility."""
         return self.api_token
+
+
+class CourtListenerConfig(APIConfig):
+    """CourtListener-specific configuration extending base API config."""
+
+    # Output settings
+    output_dir: Path = Field(
+        default=Path("data/raw/courtlistener"),
+        description="Output directory for downloaded files"
+    )
+
+    # Default processing settings
+    default_pages: int = Field(
+        default=1, description="Default number of pages to fetch"
+    )
+    default_page_size: int = Field(
+        default=50, description="Default results per page"
+    )
+    default_date_min: Optional[str] = Field(
+        default=None, description="Default minimum filing date"
+    )
+    api_mode: str = Field(
+        default="standard", description="API mode (standard or recap)"
+    )
+
+    # Query settings
+    default_chunk_size: int = Field(
+        default=10, description="Default company chunk size"
+    )
+    max_chunk_size: int = Field(
+        default=50, description="Maximum company chunk size"
+    )
+
+    # Async settings
+    max_concurrency: int = Field(
+        default=2, description="Maximum concurrent requests"
+    )
+    async_rate_limit: float = Field(
+        default=3.0, description="Rate limit for async operations"
+    )
+
+    # CourtListener-specific settings
+    statute_queries: Dict[str, str] = Field(
+        default_factory=dict,
+        description="Statute-specific search query templates"
+    )
 
 
 # --------------------------------------------------------------------------- #

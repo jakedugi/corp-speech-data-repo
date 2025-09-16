@@ -1,7 +1,7 @@
 import csv
 from pathlib import Path
 import pytest
-from corp_speech_risk_dataset.api.adapters.courtlistener.queries import (
+from corpus_hydrator.adapters.courtlistener.parsers.query_builder import (
     build_queries,
     STATUTE_QUERIES,
 )
