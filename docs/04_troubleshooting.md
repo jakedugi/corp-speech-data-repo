@@ -392,34 +392,34 @@ echo "Package installations:"
 python -c "
 try:
     import corpus_types
-    print('✅ corpus_types installed')
+    print('OK corpus_types installed')
 except ImportError as e:
-    print(f'❌ corpus_types: {e}')
+    print(f'ERROR corpus_types: {e}')
 
 try:
     import corpus_hydrator
-    print('✅ corpus_hydrator installed')
+    print('OK corpus_hydrator installed')
 except ImportError as e:
-    print(f'❌ corpus_hydrator: {e}')
+    print(f'ERROR corpus_hydrator: {e}')
 
 try:
     import corpus_cleaner
-    print('✅ corpus_cleaner installed')
+    print('OK corpus_cleaner installed')
 except ImportError as e:
-    print(f'❌ corpus_cleaner: {e}')
+    print(f'ERROR corpus_cleaner: {e}')
 
 try:
     import corpus_extractors
-    print('✅ corpus_extractors installed')
+    print('OK corpus_extractors installed')
 except ImportError as e:
-    print(f'❌ corpus_extractors: {e}')
+    print(f'ERROR corpus_extractors: {e}')
 "
 echo ""
 echo "CLI tools:"
-which hydrator || echo "❌ hydrator not found"
-which cleaner || echo "❌ cleaner not found"
-which extract || echo "❌ extract not found"
-which corpus-validate || echo "❌ corpus-validate not found"
+which hydrator || echo "ERROR hydrator not found"
+which cleaner || echo "ERROR cleaner not found"
+which extract || echo "ERROR extract not found"
+which corpus-validate || echo "ERROR corpus-validate not found"
 ```
 
 Run this script to quickly diagnose most common issues.

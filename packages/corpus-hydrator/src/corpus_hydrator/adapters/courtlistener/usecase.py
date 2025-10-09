@@ -88,11 +88,11 @@ class CourtListenerUseCase:
         Supports strict case limits that override all other limits.
         """
         if self.max_cases is not None:
-            logger.info(f"🎯 STRICT CASE LIMIT: Max {self.max_cases} total cases")
+            logger.info(f"STRICT CASE LIMIT: Max {self.max_cases} total cases")
         elif self.max_companies == 1:
-            logger.info("🧪 TEST MODE: 1 company processing")
+            logger.info("TEST MODE: 1 company processing")
         else:
-            logger.info("📊 BASE MODE: All companies with full pagination")
+            logger.info("BASE MODE: All companies with full pagination")
 
         for statute in self.statutes:
             queries = build_queries(
@@ -104,7 +104,7 @@ class CourtListenerUseCase:
             for i, query in enumerate(queries):
                 # Check if we've reached the case limit
                 if self.max_cases is not None and self.total_cases_processed >= self.max_cases:
-                    logger.info(f"🎯 Reached case limit ({self.max_cases}), stopping orchestration")
+                    logger.info(f"LIMIT Reached case limit ({self.max_cases}), stopping orchestration")
                     break
 
                 remaining_cases = self.max_cases - self.total_cases_processed if self.max_cases else None
@@ -151,7 +151,7 @@ class CourtListenerUseCase:
         if self.max_cases is not None:
             remaining_capacity = self.max_cases - self.total_cases_processed
             if remaining_capacity <= 0:
-                logger.info("🎯 Case limit already reached, skipping this query")
+                logger.info("LIMIT Case limit already reached, skipping this query")
                 return 0
 
             # Use the smaller of our configured limits and remaining capacity
@@ -167,7 +167,7 @@ class CourtListenerUseCase:
             params = {"q": query, "type": "d", "page_size": effective_page_size}
             data = self.client._get(f"{self.client.BASE_URL}/search/", params)
             results = data.get("results", [])[:effective_page_size]
-            logger.info(f"🎯 Strict limit: Found {len(results)} cases (needed {remaining_capacity})")
+            logger.info(f"LIMIT Strict limit: Found {len(results)} cases (needed {remaining_capacity})")
         else:
             # Standard mode: Full pagination with limits
             all_results = []
@@ -185,7 +185,7 @@ class CourtListenerUseCase:
                 if remaining_needed > 0:
                     all_results.extend(batch_results[:remaining_needed])
 
-                logger.info(f"📊 Page {page}: Retrieved {len(batch_results)} cases, kept {len(all_results)} total")
+                logger.info(f"Page {page}: Retrieved {len(batch_results)} cases, kept {len(all_results)} total")
 
                 # Check if we've reached our limit or there's no next page
                 if (effective_max_results and len(all_results) >= effective_max_results) or not data.get("next"):
@@ -209,7 +209,7 @@ class CourtListenerUseCase:
             if len(results) > available_slots:
                 results = results[:available_slots]
                 data = {"results": results, "count": len(results)}
-                logger.info(f"🎯 Limited to {len(results)} cases to respect total limit")
+                logger.info(f"LIMIT Limited to {len(results)} cases to respect total limit")
 
         # Save search results
         search_path = search_dir / "search_api_results.json"
@@ -262,11 +262,11 @@ class CourtListenerUseCase:
         case_dir = self.outdir / slug
         ensure_dir(case_dir)
 
-        # 2️⃣ Docket shell
+        # 2. Docket shell
         dockets_dir = case_dir / "dockets"
         process_and_save(self.client, "dockets", {"id": dk_id}, dockets_dir, limit=1)
 
-        # 3️⃣ IA dump
+        # 3. IA dump
         ia_json_path = dockets_dir / "dockets_0.json"
         ia_url = None
         if ia_json_path.exists():
@@ -280,7 +280,7 @@ class CourtListenerUseCase:
                 except Exception as e:
                     logger.warning(f"Failed to download IA dump for {slug}: {e}")
 
-        # 4️⃣ Free-attachment back-fill if gaps
+        # 4. Free-attachment back-fill if gaps
         ia_dump_path = case_dir / "ia_dump.json"
         if needs_recap_fetch(ia_dump_path):
             pacer_user = os.getenv("PACER_USER")
@@ -309,7 +309,7 @@ class CourtListenerUseCase:
                     else:
                         raise
 
-        # 5️⃣ Entries (RECAP mode gives nested docs)
+        # 5. Entries (RECAP mode gives nested docs)
         entries_dir = case_dir / "entries"
         process_docket_entries(
             self.config,
@@ -398,7 +398,7 @@ class CourtListenerUseCase:
                                         f"Failed to download PDF for doc {doc['id']}: {e}"
                                     )
 
-        # 6️⃣ Clusters → Opinions (only create directories if data exists)
+        # 6. Clusters → Opinions (only create directories if data exists)
         clusters = self.client.fetch_resource("clusters", {"docket": dk_id}, limit=100)
         if clusters:
             clusters_dir = case_dir / "clusters"
@@ -440,7 +440,7 @@ class CourtListenerUseCase:
         case_dir = self.outdir / slug
         ensure_dir(case_dir)
 
-        # 2️⃣ Docket shell (async)
+        # 2. Docket shell (async)
         dockets_dir = case_dir / "dockets"
         docket_data = await self.async_client.fetch_resource_async("dockets", {"id": dk_id}, limit=1)
         if docket_data:
@@ -448,7 +448,7 @@ class CourtListenerUseCase:
             with open(dockets_dir / "dockets_0.json", "w") as f:
                 json.dump(docket_data[0], f, indent=2)
 
-        # 3️⃣ IA dump
+        # 3. IA dump
         ia_json_path = dockets_dir / "dockets_0.json"
         ia_url = None
         if ia_json_path.exists():
@@ -462,7 +462,7 @@ class CourtListenerUseCase:
                 except Exception as e:
                     logger.warning(f"Failed to download IA dump for {slug}: {e}")
 
-        # 4️⃣ Free-attachment back-fill if gaps
+        # 4. Free-attachment back-fill if gaps
         ia_dump_path = case_dir / "ia_dump.json"
         if needs_recap_fetch(ia_dump_path):
             pacer_user = os.getenv("PACER_USER")
@@ -491,7 +491,7 @@ class CourtListenerUseCase:
                     else:
                         raise
 
-        # 5️⃣ Entries (async RECAP mode)
+        # 5. Entries (async RECAP mode)
         entries_dir = case_dir / "entries"
         entries_data = await self.async_client.fetch_resource_async(
             "docket_entries",
@@ -516,7 +516,7 @@ class CourtListenerUseCase:
 
             logger.info(f"Saved {len(entries_data)} docket entries to {entries_dir}")
 
-        # 6️⃣ RECAP Documents (fully async parallel fetching)
+        # 6. RECAP Documents (fully async parallel fetching)
         filings_dir = case_dir / "filings"
         ensure_dir(filings_dir)
 
@@ -597,7 +597,7 @@ class CourtListenerUseCase:
                             except Exception as e:
                                 logger.debug(f"Failed to download PDF {doc['id']}: {type(e).__name__}")
 
-        # 7️⃣ Clusters & Opinions (fully async)
+        # 7. Clusters & Opinions (fully async)
         clusters_data = await self.async_client.fetch_resource_async(
             "clusters", {"docket": dk_id}, limit=100
         )
@@ -645,4 +645,4 @@ class CourtListenerUseCase:
         else:
             logger.info(f"No clusters found for docket {dk_id} ({slug})")
 
-        logger.info(f"✅ Completed full async hydration for {slug}")
+        logger.info(f"Completed full async hydration for {slug}")

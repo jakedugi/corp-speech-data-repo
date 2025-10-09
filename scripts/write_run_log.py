@@ -51,7 +51,7 @@ make {make_target}
     with run_md.open('a', encoding='utf-8') as f:
         f.write(env_info)
 
-    print(f"✅ Run log appended to {run_md}")
+    print(f"Run log appended to {run_md}")
 
 
 if __name__ == "__main__":

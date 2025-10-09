@@ -172,21 +172,6 @@ class QueryConfig(BaseModel):
 - RSS Feeds: 1 request/minute per feed
 - Wikipedia: 1 request/second with user agent
 
-### Ethical Usage
-- Respect robots.txt for web scraping
-- Use appropriate user agents
-- Cache responses to reduce API load
-- Handle rate limits gracefully
-
-## Error Handling
-
-The module includes comprehensive error handling:
-
-- **Network Errors**: Automatic retry with exponential backoff
-- **Rate Limits**: Queue requests and respect limits
-- **API Errors**: Structured error messages and recovery
-- **Data Validation**: Pydantic models for all inputs/outputs
-
 ## Logging
 
 Uses Loguru for structured logging:
@@ -196,14 +181,6 @@ from loguru import logger
 
 logger.info("Fetched {count} documents from {source}", count=len(documents), source="courtlistener")
 ```
-
-## Contributing
-
-1. Fork the repository
-2. Create a feature branch
-3. Add tests for new functionality
-4. Ensure all tests pass
-5. Submit a pull request
 
 ## License
 

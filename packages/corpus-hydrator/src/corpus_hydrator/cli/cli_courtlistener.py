@@ -222,23 +222,23 @@ def orchestrate(
         page_size = max_cases
         pages = 1
         if test_mode:
-            logger.info(f"🧪 TEST MODE: Max {max_cases} cases in {outdir}")
+            logger.info(f"TEST MODE: Max {max_cases} cases in {outdir}")
         else:
-            logger.info(f"🎯 STRICT LIMIT MODE: Max {max_cases} total cases")
+            logger.info(f"STRICT LIMIT MODE: Max {max_cases} total cases")
     elif test_mode:
         # Test mode without strict limit
         max_companies = 1
         max_results = 10  # Allow more results per query
         page_size = 10
         pages = 1
-        logger.info(f"🧪 TEST MODE: 1 company, 1 page in {outdir}")
+        logger.info(f"TEST MODE: 1 company, 1 page in {outdir}")
     else:
         # Base mode: All companies with full pagination
         max_companies = None  # Process all companies
         max_results = None    # No limit on results per query
         page_size = 50        # Standard page size for production
         pages = None          # Let pagination handle all pages
-        logger.info("📊 BASE MODE: All companies with full pagination")
+        logger.info("BASE MODE: All companies with full pagination")
 
     try:
         usecase = CourtListenerUseCase(

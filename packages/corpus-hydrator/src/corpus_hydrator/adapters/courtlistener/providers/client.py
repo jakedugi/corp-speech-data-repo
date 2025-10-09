@@ -14,7 +14,7 @@ from typing import Any, Dict, List, Optional
 import asyncio
 import random
 from asyncio import Semaphore
-from httpx import AsyncClient, Limits, AsyncHTTPTransport
+from httpx import AsyncClient, Limits, AsyncHTTPTransport 
 
 from corpus_types.schemas import CourtListenerConfig
 from ..utils.http_utils import safe_sync_get, safe_async_get

@@ -17,13 +17,13 @@ Documents from any source (CourtListener, RSS, web scraping).
 
 | Field | Type | Required | Description |
 |-------|------|----------|-------------|
-| `schema_version` | string | ✅ | Schema version (currently "1.0") |
-| `doc_id` | string | ✅ | Unique document identifier |
-| `source_uri` | string | ✅ | Original source URL |
-| `retrieved_at` | datetime | ✅ | When document was retrieved |
-| `raw_text` | string | ✅ | Full document text content |
-| `meta` | object | ✅ | Document metadata |
-| `provenance` | object | ✅ | Complete provenance information |
+| `schema_version` | string | Yes | Schema version (currently "1.0") |
+| `doc_id` | string | Yes | Unique document identifier |
+| `source_uri` | string | Yes | Original source URL |
+| `retrieved_at` | datetime | Yes | When document was retrieved |
+| `raw_text` | string | Yes | Full document text content |
+| `meta` | object | Yes | Document metadata |
+| `provenance` | object | Yes | Complete provenance information |
 
 ### Sample Doc
 
@@ -59,16 +59,16 @@ Extracted quotes with speaker attribution and confidence scores.
 
 | Field | Type | Required | Description |
 |-------|------|----------|-------------|
-| `schema_version` | string | ✅ | Schema version (currently "1.0") |
-| `quote_id` | string | ✅ | Unique quote identifier |
-| `doc_id` | string | ✅ | Parent document ID |
-| `text` | string | ✅ | Normalized quote text |
-| `context` | string | ❌ | Surrounding context |
-| `speaker` | string | ❌ | Detected speaker |
-| `score` | float | ❌ | Extraction confidence (0-1) |
-| `span` | object | ❌ | Character positions in document |
-| `urls` | array | ❌ | Source URLs |
-| `stage` | integer | ❌ | Processing stage |
+| `schema_version` | string | Yes | Schema version (currently "1.0") |
+| `quote_id` | string | Yes | Unique quote identifier |
+| `doc_id` | string | Yes | Parent document ID |
+| `text` | string | Yes | Normalized quote text |
+| `context` | string | No | Surrounding context |
+| `speaker` | string | No | Detected speaker |
+| `score` | float | No | Extraction confidence (0-1) |
+| `span` | object | No | Character positions in document |
+| `urls` | array | No | Source URLs |
+| `stage` | integer | No | Processing stage |
 
 ### Sample Quote
 
@@ -98,13 +98,13 @@ Case outcomes with classification and confidence.
 
 | Field | Type | Required | Description |
 |-------|------|----------|-------------|
-| `schema_version` | string | ✅ | Schema version (currently "1.0") |
-| `case_id` | string | ✅ | Unique case identifier |
-| `label` | string | ✅ | Outcome label (win/loss/settlement/dismissal/mixed/unknown) |
-| `label_source` | string | ✅ | How label was determined |
-| `confidence` | float | ❌ | Classification confidence (0-1) |
-| `date` | date | ❌ | Outcome date |
-| `meta` | object | ❌ | Additional metadata |
+| `schema_version` | string | Yes | Schema version (currently "1.0") |
+| `case_id` | string | Yes | Unique case identifier |
+| `label` | string | Yes | Outcome label (win/loss/settlement/dismissal/mixed/unknown) |
+| `label_source` | string | Yes | How label was determined |
+| `confidence` | float | No | Classification confidence (0-1) |
+| `date` | date | No | Outcome date |
+| `meta` | object | No | Additional metadata |
 
 ### Sample Outcome
 

@@ -162,13 +162,13 @@ def main():
     manifest_path = data_dir / "manifest.json"
     manifest_path.write_text(json.dumps(manifest, indent=2, ensure_ascii=False))
 
-    print(f"✅ Manifest written to {manifest_path}")
-    print(f"📊 Run ID: {run_id}")
-    print(f"📈 Total Records: {total_records}")
-    print(f"🔐 Fingerprints computed: {len([f for f in fingerprints.values() if f != 'file_missing'])}")
-    print(f"📁 Output directory: {data_dir}")
+    print(f"Manifest written to {manifest_path}")
+    print(f"Run ID: {run_id}")
+    print(f"Total Records: {total_records}")
+    print(f"Fingerprints computed: {len([f for f in fingerprints.values() if f != 'file_missing'])}")
+    print(f"Output directory: {data_dir}")
     if manifest["artifacts"]["missing"]:
-        print(f"⚠️  Missing artifacts: {manifest['artifacts']['missing']}")
+        print(f"WARNING: Missing artifacts: {manifest['artifacts']['missing']}")
 
 
 if __name__ == "__main__":

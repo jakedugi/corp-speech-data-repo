@@ -39,17 +39,17 @@ The pipeline follows a clean separation of concerns with four specialized packag
 
 ## Key Features
 
-### 🔒 Deterministic & Reproducible
+### Deterministic & Reproducible
 - Same inputs always produce same outputs
 - BLAKE3 fingerprints for data integrity verification
 - Stable, collision-resistant IDs
 
-### ✅ Validated & Typed
+### Validated & Typed
 - Strict Pydantic schemas for all data
 - Runtime validation with detailed error messages
 - Type-safe data contracts between components
 
-### 🚀 Production-Ready
+### Production-Ready
 - Comprehensive error handling and logging
 - Configurable timeouts and retry logic
 - Environment-based configuration

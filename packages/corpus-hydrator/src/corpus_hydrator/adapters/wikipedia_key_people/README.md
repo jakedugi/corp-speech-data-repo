@@ -468,7 +468,7 @@ uv run python -m corpus_hydrator.adapters.wikipedia_key_people.cli.commands scra
   --workers 2
 ```
 
-## 📈 Performance & Reliability
+## Performance & Reliability
 
 ### Caching Strategy
 - **ETag Support**: Avoids re-downloading unchanged Wikipedia pages
@@ -494,7 +494,7 @@ uv run python -m corpus_hydrator.adapters.wikipedia_key_people.cli.commands scra
 - **Rate Limiting**: Polite extraction respecting source limits
 - **Resource Monitoring**: Built-in performance metrics
 
-## 🔮 Future Extensions
+## Future Extensions
 
 ### Ready-to-Extend Features
 
@@ -537,7 +537,7 @@ class MetricsCollector:
         pass
 ```
 
-## 📞 Support
+## Support
 
 ### Getting Help
 

@@ -27,7 +27,7 @@ def count_jsonl_records(path: pathlib.Path) -> int:
 
 def main():
     """Check pipeline status."""
-    print("🚀 Corporate Speech Data Pipeline Status")
+    print("Corporate Speech Data Pipeline Status")
     print("=" * 50)
 
     # Check core files exist
@@ -42,10 +42,10 @@ def main():
         "PIPELINE_STATUS.md"
     ]
 
-    print("\n📁 Core Files Check:")
+    print("\nCore Files Check:")
     for file_path in core_files:
         exists = pathlib.Path(file_path).exists()
-        status = "✅" if exists else "❌"
+        status = "OK" if exists else "MISSING"
         print(f"  {status} {file_path}")
 
     # Check fixtures
@@ -57,7 +57,7 @@ def main():
         "manifest.json"
     ]
 
-    print("\n📊 Fixture Data Check:")
+    print("\nFixture Data Check:")
     total_records = 0
     for file_name in fixture_files:
         file_path = fixtures_dir / file_name
@@ -65,9 +65,9 @@ def main():
             count = count_jsonl_records(file_path)
             total_records += count
             fingerprint = blake3_digest(file_path)[:16] + "..."
-            print(f"  ✅ {file_name}: {count} records, hash={fingerprint}")
+            print(f"  OK {file_name}: {count} records, hash={fingerprint}")
         else:
-            print(f"  ❌ {file_name}: missing")
+            print(f"  MISSING {file_name}: missing")
 
     # Check import fixes
     import_issues = 0
@@ -78,8 +78,8 @@ def main():
     except:
         pass
 
-    print(f"\n🔧 Import Fixes: {14} files updated")
-    print(f"📈 Total Fixture Records: {total_records}")
+    print(f"\nImport Fixes: {14} files updated")
+    print(f"Total Fixture Records: {total_records}")
 
     # Check CI updates
     ci_updated = False
@@ -91,19 +91,19 @@ def main():
     except:
         pass
 
-    ci_status = "✅ Updated" if ci_updated else "⚠️ Needs update"
-    print(f"🔄 CI Workflows: {ci_status}")
+    ci_status = "Updated" if ci_updated else "WARNING: Needs update"
+    print(f"CI Workflows: {ci_status}")
 
     print("\n" + "=" * 50)
-    print("🎯 ACCEPTANCE CRITERIA STATUS:")
-    print("✅ Single command produces bundle (make demo_e2e)")
-    print("✅ Schemas valid (corpus-validate CLI ready)")
-    print("✅ Deterministic fingerprints (blake3 implemented)")
-    print("✅ No duplicate IDs (validation utilities ready)")
-    print("✅ Offline fixtures (14+ files updated)")
-    print("✅ Stable IDs (deterministic generators ready)")
+    print("ACCEPTANCE CRITERIA STATUS:")
+    print("- Single command produces bundle (make demo_e2e)")
+    print("- Schemas valid (corpus-validate CLI ready)")
+    print("- Deterministic fingerprints (blake3 implemented)")
+    print("- No duplicate IDs (validation utilities ready)")
+    print("- Offline fixtures (14+ files updated)")
+    print("- Stable IDs (deterministic generators ready)")
 
-    print("\n🎉 PIPELINE STATUS: PRODUCTION READY!")
+    print("\nPIPELINE STATUS: PRODUCTION READY!")
     print("Next: Install dependencies and run 'make demo_e2e'")
 
 

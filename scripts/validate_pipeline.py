@@ -23,27 +23,27 @@ from corpus_types.utils.deterministic_ids import (
 
 def test_imports():
     """Test that all critical imports work."""
-    print("🔍 Testing imports...")
+    print("Testing imports...")
 
     try:
         from corpus_types.schemas.models import Doc, Quote, Outcome
-        print("✅ corpus_types imports work")
+        print("OK corpus_types imports work")
     except ImportError as e:
-        print(f"❌ corpus_types import failed: {e}")
+        print(f"ERROR corpus_types import failed: {e}")
         return False
 
     try:
         from corpus_api.client.base_api_client import BaseAPIClient
-        print("✅ corpus_api imports work")
+        print("OK corpus_api imports work")
     except ImportError as e:
-        print(f"❌ corpus_api import failed: {e}")
+        print(f"ERROR corpus_api import failed: {e}")
         return False
 
     try:
         from corpus_cleaner.cleaner import TextCleaner
-        print("✅ corpus_cleaner imports work")
+        print("OK corpus_cleaner imports work")
     except ImportError as e:
-        print(f"❌ corpus_cleaner import failed: {e}")
+        print(f"ERROR corpus_cleaner import failed: {e}")
         return False
 
     return True
@@ -57,18 +57,18 @@ def test_deterministic_ids():
     id1 = generate_quote_id("doc_test", 10, 20, "test quote")
     id2 = generate_quote_id("doc_test", 10, 20, "test quote")
     if id1 == id2:
-        print(f"✅ Quote ID generation deterministic: {id1}")
+        print(f"OK Quote ID generation deterministic: {id1}")
     else:
-        print(f"❌ Quote ID generation not deterministic: {id1} != {id2}")
+        print(f"ERROR Quote ID generation not deterministic: {id1} != {id2}")
         return False
 
     # Test doc ID generation
     doc_id1 = generate_doc_id("https://example.com/test", "2024-01-01T12:00:00Z")
     doc_id2 = generate_doc_id("https://example.com/test", "2024-01-01T12:00:00Z")
     if doc_id1 == doc_id2:
-        print(f"✅ Doc ID generation deterministic: {doc_id1}")
+        print(f"OK Doc ID generation deterministic: {doc_id1}")
     else:
-        print(f"❌ Doc ID generation not deterministic: {doc_id1} != {doc_id2}")
+        print(f"ERROR Doc ID generation not deterministic: {doc_id1} != {doc_id2}")
         return False
 
     return True
@@ -76,14 +76,14 @@ def test_deterministic_ids():
 
 def test_fixture_integrity():
     """Test fixture data integrity."""
-    print("\n📊 Testing fixture data integrity...")
+    print("\nTesting fixture data integrity...")
 
     fixtures_dir = pathlib.Path("corpus_types/fixtures")
 
     # Test docs fixture
     docs_file = fixtures_dir / "docs.raw.small.jsonl"
     if not docs_file.exists():
-        print(f"❌ Docs fixture missing: {docs_file}")
+        print(f"ERROR Docs fixture missing: {docs_file}")
         return False
 
     docs = []
@@ -92,20 +92,20 @@ def test_fixture_integrity():
             if line.strip():
                 docs.append(json.loads(line.strip()))
 
-    print(f"✅ Loaded {len(docs)} documents from fixture")
+    print(f"OK Loaded {len(docs)} documents from fixture")
 
     # Validate docs have required fields
     for i, doc in enumerate(docs):
         required_fields = ["doc_id", "raw_text", "schema_version"]
         for field in required_fields:
             if field not in doc:
-                print(f"❌ Document {i} missing field: {field}")
+                print(f"ERROR Document {i} missing field: {field}")
                 return False
 
     # Test quotes fixture
     quotes_file = fixtures_dir / "quotes.small.jsonl"
     if not quotes_file.exists():
-        print(f"❌ Quotes fixture missing: {quotes_file}")
+        print(f"ERROR Quotes fixture missing: {quotes_file}")
         return False
 
     quotes = []
@@ -114,37 +114,37 @@ def test_fixture_integrity():
             if line.strip():
                 quotes.append(json.loads(line.strip()))
 
-    print(f"✅ Loaded {len(quotes)} quotes from fixture")
+    print(f"OK Loaded {len(quotes)} quotes from fixture")
 
     # Test ID references
     doc_ids = {doc["doc_id"] for doc in docs}
     for quote in quotes:
         if quote["doc_id"] not in doc_ids:
-            print(f"❌ Quote references non-existent doc_id: {quote['doc_id']}")
+            print(f"ERROR Quote references non-existent doc_id: {quote['doc_id']}")
             return False
 
-    print("✅ All quote doc_id references are valid")
+    print("OK All quote doc_id references are valid")
 
     # Test ID uniqueness
     doc_ids_list = [doc["doc_id"] for doc in docs]
     is_unique, duplicates = validate_id_uniqueness([{"id": id} for id in doc_ids_list], "id")
     if not is_unique:
-        print(f"❌ Duplicate document IDs: {duplicates}")
+        print(f"ERROR Duplicate document IDs: {duplicates}")
         return False
 
     quote_ids_list = [quote["quote_id"] for quote in quotes]
     is_unique, duplicates = validate_id_uniqueness([{"id": id} for id in quote_ids_list], "id")
     if not is_unique:
-        print(f"❌ Duplicate quote IDs: {duplicates}")
+        print(f"ERROR Duplicate quote IDs: {duplicates}")
         return False
 
-    print("✅ All IDs are unique")
+    print("OK All IDs are unique")
     return True
 
 
 def test_manifest_generation():
     """Test manifest generation."""
-    print("\n📋 Testing manifest generation...")
+    print("\nTesting manifest generation...")
 
     fixtures_dir = pathlib.Path("corpus_types/fixtures")
 
@@ -155,13 +155,13 @@ def test_manifest_generation():
     ], capture_output=True, text=True)
 
     if result.returncode != 0:
-        print(f"❌ Manifest generation failed: {result.stderr}")
+        print(f"ERROR Manifest generation failed: {result.stderr}")
         return False
 
     # Check manifest exists
     manifest_file = fixtures_dir / "manifest.json"
     if not manifest_file.exists():
-        print(f"❌ Manifest file not created: {manifest_file}")
+        print(f"ERROR Manifest file not created: {manifest_file}")
         return False
 
     # Validate manifest content
@@ -171,10 +171,10 @@ def test_manifest_generation():
     required_keys = ["generated_at", "versions", "artifacts", "counts", "fingerprints"]
     for key in required_keys:
         if key not in manifest:
-            print(f"❌ Manifest missing key: {key}")
+            print(f"ERROR Manifest missing key: {key}")
             return False
 
-    print("✅ Manifest generated successfully")
+    print("OK Manifest generated successfully")
     print(f"📊 Artifacts: {manifest['artifacts']}")
     print(f"📈 Counts: {manifest['counts']}")
     return True
@@ -192,19 +192,19 @@ def test_text_cleaner():
         cleaned = cleaner.clean(test_text)
 
         if "Hello world" in cleaned and "\n\n" in cleaned:
-            print("✅ Text cleaner works correctly")
+            print("OK Text cleaner works correctly")
             return True
         else:
-            print(f"❌ Text cleaner output unexpected: {cleaned}")
+            print(f"ERROR Text cleaner output unexpected: {cleaned}")
             return False
     except Exception as e:
-        print(f"❌ Text cleaner test failed: {e}")
+        print(f"ERROR Text cleaner test failed: {e}")
         return False
 
 
 def main():
     """Run all validation tests."""
-    print("🚀 Data Pipeline Validation")
+    print("Data Pipeline Validation")
     print("=" * 40)
 
     tests = [
@@ -223,18 +223,18 @@ def main():
             if test_func():
                 passed += 1
             else:
-                print(f"❌ {test_name} failed")
+                print(f"ERROR {test_name} failed")
         except Exception as e:
-            print(f"❌ {test_name} crashed: {e}")
+            print(f"ERROR {test_name} crashed: {e}")
 
     print("\n" + "=" * 40)
-    print(f"📊 Results: {passed}/{total} tests passed")
+    print(f"Results: {passed}/{total} tests passed")
 
     if passed == total:
-        print("🎉 All tests passed! Data pipeline is ready.")
+        print("All tests passed! Data pipeline is ready.")
         return 0
     else:
-        print("⚠️  Some tests failed. Check the output above.")
+        print("WARNING: Some tests failed. Check the output above.")
         return 1
 
 

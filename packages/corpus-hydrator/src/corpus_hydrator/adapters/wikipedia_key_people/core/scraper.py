@@ -479,7 +479,7 @@ class WikipediaKeyPeopleScraper:
                                 company.key_people_count = len(key_people)
                                 company.processing_success = True
                                 successful_companies += 1
-                                logger.info(f"✓ {company.ticker}: {len(key_people)} key people")
+                                logger.info(f"OK {company.ticker}: {len(key_people)} key people")
                             else:
                                 company.processing_success = False
                                 logger.warning(f"No key people found for {company.ticker}")

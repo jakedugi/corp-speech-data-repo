@@ -25,23 +25,23 @@ from corpus_types.schemas.scraper import (
 
 def test_configuration():
     """Test configuration validation."""
-    print("🔧 Testing Configuration...")
+    print("Testing Configuration...")
 
     config = get_default_config()
 
     # Validate configuration
     issues = validate_config(config)
     if issues:
-        print(f"❌ Configuration issues: {issues}")
+        print(f"ERROR Configuration issues: {issues}")
         return False
 
-    print("✅ Configuration is valid")
+    print("OK Configuration is valid")
     return True
 
 
 def test_dry_run():
     """Test scraper in dry-run mode."""
-    print("\n🏃 Testing Dry Run Mode...")
+    print("\nTesting Dry Run Mode...")
 
     config = get_sp500_config()
     config.dry_run = True
@@ -53,18 +53,18 @@ def test_dry_run():
     # Test index scraping
     companies, result = scraper.scrape_index("sp500")
 
-    print(f"📊 Scraped {len(companies)} companies (dry run)")
-    print(f"⏱️  Duration: {result.duration_seconds or 0:.2f} seconds")
+    print(f"Scraped {len(companies)} companies (dry run)")
+    print(f"Duration: {result.duration_seconds or 0:.2f} seconds")
 
     if companies:
-        print(f"📋 Sample company: {companies[0].official_name} ({companies[0].ticker})")
+        print(f"Sample company: {companies[0].official_name} ({companies[0].ticker})")
 
     return len(companies) >= 0  # Should work even in dry run
 
 
 def test_data_models():
     """Test data model creation and validation."""
-    print("\n📋 Testing Data Models...")
+    print("\nTesting Data Models...")
 
     from corpus_types.schemas.scraper import CompanyRecord, OfficerRecord
 
@@ -77,9 +77,9 @@ def test_data_models():
             wikipedia_url="https://en.wikipedia.org/wiki/Test_Company",
             index_name="test"
         )
-        print("✅ CompanyRecord created successfully")
+        print("OK CompanyRecord created successfully")
     except Exception as e:
-        print(f"❌ CompanyRecord creation failed: {e}")
+        print(f"ERROR CompanyRecord creation failed: {e}")
         return False
 
     # Test OfficerRecord
@@ -92,9 +92,9 @@ def test_data_models():
             cik="0000123456",
             source="wikipedia"
         )
-        print("✅ OfficerRecord created successfully")
+        print("OK OfficerRecord created successfully")
     except Exception as e:
-        print(f"❌ OfficerRecord creation failed: {e}")
+        print(f"ERROR OfficerRecord creation failed: {e}")
         return False
 
     # Test validation
@@ -105,17 +105,17 @@ def test_data_models():
             wikipedia_url="https://example.com",
             index_name="test"
         )
-        print("❌ Validation should have failed")
+        print("ERROR Validation should have failed")
         return False
     except ValueError:
-        print("✅ Validation correctly rejected invalid data")
+        print("OK Validation correctly rejected invalid data")
 
     return True
 
 
 def test_index_configurations():
     """Test different index configurations."""
-    print("\n📊 Testing Index Configurations...")
+    print("\nTesting Index Configurations...")
 
     config = get_default_config()
 
@@ -137,7 +137,7 @@ def test_index_configurations():
 
 def test_rate_limiting():
     """Test rate limiting functionality."""
-    print("\n⏱️  Testing Rate Limiting...")
+    print("\nTesting Rate Limiting...")
 
     from corpus_hydrator.adapters.wikipedia.scraper import RateLimiter
     import time
@@ -153,7 +153,7 @@ def test_rate_limiting():
     wait_time = limiter.acquire()
     assert wait_time > 0, "Should wait after burst capacity exceeded"
 
-    print("✅ Rate limiting working correctly")
+    print("OK Rate limiting working correctly")
     return True
 
 
@@ -176,21 +176,21 @@ def main():
     for test_name, test_func in tests:
         try:
             if test_func():
-                print(f"✅ {test_name}: PASSED")
+                print(f"OK {test_name}: PASSED")
                 passed += 1
             else:
-                print(f"❌ {test_name}: FAILED")
+                print(f"ERROR {test_name}: FAILED")
         except Exception as e:
-            print(f"❌ {test_name}: ERROR - {e}")
+            print(f"ERROR {test_name}: ERROR - {e}")
 
     print("\n" + "=" * 50)
-    print(f"📊 Test Results: {passed}/{total} passed")
+    print(f"Test Results: {passed}/{total} passed")
 
     if passed == total:
-        print("🎉 All tests passed!")
+        print("All tests passed!")
         return 0
     else:
-        print("⚠️  Some tests failed")
+        print("WARNING: Some tests failed")
         return 1
 
 

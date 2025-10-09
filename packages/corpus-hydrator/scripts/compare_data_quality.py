@@ -8,7 +8,7 @@ from pathlib import Path
 
 def compare_data_quality():
     """Compare the quality of original vs enhanced data"""
-    print("🔍 Data Quality Comparison")
+    print("Data Quality Comparison")
     print("=" * 60)
 
     # Load original data
@@ -30,7 +30,7 @@ def compare_data_quality():
     # Compare samples
     sample_tickers = ['AAPL', 'MSFT', 'JNJ', 'WMT', 'JPM']
 
-    print("\n📊 Data Quality Improvements:")
+    print("\nData Quality Improvements:")
     print("-" * 60)
 
     for ticker in sample_tickers:
@@ -38,7 +38,7 @@ def compare_data_quality():
             orig = original_data[ticker]
             enh = enhanced_data[ticker]
 
-            print(f"\n🏢 {ticker} ({orig['official_name']}):")
+            print(f"\n{ticker} ({orig['official_name']}):")
             print(f"   Original: {orig['official_name']}")
             print(f"   SEC Name: {enh.get('sec_entity_name', 'N/A')}")
 
@@ -61,7 +61,7 @@ def compare_data_quality():
                 print(f"   Latest 10-K: {enh['latest_10k_date']}")
 
     # Summary statistics
-    print("\n📈 Overall Enhancement Statistics:")
+    print("\nOverall Enhancement Statistics:")
     print(f"   Total companies: {len(original_data)}")
 
     enhanced_count = 0
@@ -84,16 +84,16 @@ def compare_data_quality():
     print(f"   Companies with SIC classifications: {sic_count} ({sic_count/len(original_data)*100:.1f}%)")
     print(f"   Companies with recent filings: {filing_count} ({filing_count/len(original_data)*100:.1f}%)")
 
-    print("\n🎯 Key Improvements:")
-    print("   ✅ Official SEC entity names (more accurate than Wikipedia)")
-    print("   ✅ Complete business addresses with phone numbers")
-    print("   ✅ SIC industry classifications with descriptions")
-    print("   ✅ State of incorporation")
-    print("   ✅ Fiscal year end dates")
-    print("   ✅ Recent SEC filing dates and accession numbers")
-    print("   ✅ SEC filer category (Large accelerated filer, etc.)")
+    print("\nKey Improvements:")
+    print("   - Official SEC entity names (more accurate than Wikipedia)")
+    print("   - Complete business addresses with phone numbers")
+    print("   - SIC industry classifications with descriptions")
+    print("   - State of incorporation")
+    print("   - Fiscal year end dates")
+    print("   - Recent SEC filing dates and accession numbers")
+    print("   - SEC filer category (Large accelerated filer, etc.)")
 
-    print("\n💡 Use Cases for Enhanced Data:")
+    print("\nUse Cases for Enhanced Data:")
     print("   • More accurate company identification and matching")
     print("   • Industry analysis and sector classification")
     print("   • Geographic analysis by state of incorporation")
@@ -101,7 +101,7 @@ def compare_data_quality():
     print("   • Financial reporting analysis")
 
     print("\n" + "=" * 60)
-    print("🏁 Data Quality Comparison Complete")
+    print("Data Quality Comparison Complete")
 
 if __name__ == "__main__":
     compare_data_quality()
