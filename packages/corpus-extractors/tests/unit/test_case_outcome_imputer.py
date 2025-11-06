@@ -6,7 +6,7 @@ from unittest.mock import patch
 
 import pytest
 
-from corp_speech_risk_dataset.corpus_extractors import QuoteExtractor
+from corpus_extractors import QuoteExtractor
 
 
 @pytest.fixture

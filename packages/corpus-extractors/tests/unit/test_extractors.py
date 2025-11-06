@@ -1,6 +1,6 @@
 """Tests for extractor functionality."""
 
-from corp_speech_risk_dataset.corpus_extractors import (
+from corpus_extractors import (
     FirstPassExtractor,
     SemanticReranker,
 )

@@ -140,6 +140,8 @@ dependencies = [
 hydrator = "corpus_hydrator.cli.fetch:app"
 wikipedia-key-people = "corpus_hydrator.adapters.wikipedia_key_people.cli.commands:app"
 scrape-wikipedia-key-people = "corpus_hydrator.adapters.wikipedia_key_people.cli.commands:scrape_index_normalized"
+corpus-clean-courtlistener = "corpus_cleaner.cli.process_courtlistener:app"
+corpus-clean-normalize = "corpus_cleaner.cli.normalize:app"
 
 
 [project.optional-dependencies]

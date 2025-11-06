@@ -366,11 +366,11 @@ class Quote(ExtensibleBase):
     )
 
     # Internal processing metadata
-    _metadata_src_path: Optional[str] = Field(None, description="Metadata source path")
-    _metadata_wrapped: Optional[bool] = Field(
+    metadata_src_path: Optional[str] = Field(None, description="Metadata source path")
+    metadata_wrapped: Optional[bool] = Field(
         None, description="Whether metadata is wrapped"
     )
-    _leakage_prevention: Dict[str, Any] = Field(
+    leakage_prevention: Dict[str, Any] = Field(
         default_factory=dict, description="Leakage prevention metadata"
     )
 
@@ -436,6 +436,39 @@ class Outcome(StrictBase):
 # --------------------------------------------------------------------------- #
 # Removed: Feature Types (ML features excluded from pre-ML schema)         #
 # --------------------------------------------------------------------------- #
+
+
+# --------------------------------------------------------------------------- #
+# Cash Amount Types                                                          #
+# --------------------------------------------------------------------------- #
+
+
+class CashAmountCandidate(StrictBase):
+    """
+    Candidate cash amount extracted from legal documents.
+
+    This model represents a potential monetary amount found during extraction,
+    along with its context and confidence scoring information.
+    """
+
+    value: float = Field(..., description="The monetary value in dollars")
+    raw_text: str = Field(..., description="The original text containing the amount")
+    context: str = Field(..., description="Surrounding context for validation")
+    feature_votes: int = Field(..., description="Number of extraction features that matched")
+
+    @validator("value")
+    def validate_value(cls, v: float) -> float:
+        """Validate that value is positive."""
+        if v <= 0:
+            raise ValueError("Cash amount value must be positive")
+        return v
+
+    @validator("feature_votes")
+    def validate_feature_votes(cls, v: int) -> int:
+        """Validate that feature_votes is non-negative."""
+        if v < 0:
+            raise ValueError("Feature votes must be non-negative")
+        return v
 
 
 # --------------------------------------------------------------------------- #
@@ -643,6 +676,7 @@ __all__ = [
     "Doc",
     "Quote",
     "Outcome",
+    "CashAmountCandidate",
 
     # Legacy types
     "QuoteCandidate",

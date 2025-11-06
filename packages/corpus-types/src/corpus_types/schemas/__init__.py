@@ -42,6 +42,7 @@ from .models import (
     Doc,
     Quote,
     Outcome,
+    CashAmountCandidate,
 
     # Legacy types
     QuoteCandidate,
@@ -114,6 +115,7 @@ __all__ = [
     "Doc",
     "Quote",
     "Outcome",
+    "CashAmountCandidate",
 
     # Legacy types
     "QuoteCandidate",
