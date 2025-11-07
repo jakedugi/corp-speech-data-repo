@@ -11,11 +11,13 @@ from typing import List, NamedTuple
 DEFAULT_MIN = 10000
 DEFAULT_CONTEXT = 100
 
+
 class Candidate(NamedTuple):
     value: float
     raw_text: str
     context: str
     feature_votes: int
+
 
 class CaseOutcomeImputer:
     def __init__(self, config: dict = None):
@@ -24,36 +26,40 @@ class CaseOutcomeImputer:
     def scan_for_candidates_from_text(self, text: str, doc_id: str) -> List[Candidate]:
         seen = set()
         out = []
-        dollar_pattern = re.compile(r'\$[\d,]+(?:\.\d{2})?')
+        dollar_pattern = re.compile(r"\$[\d,]+(?:\.\d{2})?")
 
         for match in dollar_pattern.finditer(text):
             try:
-                amount_str = match.group(0).replace('$', '').replace(',', '')
+                amount_str = match.group(0).replace("$", "").replace(",", "")
                 value = float(amount_str)
 
                 if value >= DEFAULT_MIN:
                     start, end = match.span()
-                    context = text[max(0, start - DEFAULT_CONTEXT):end + DEFAULT_CONTEXT].replace('\n', ' ')
+                    context = text[
+                        max(0, start - DEFAULT_CONTEXT) : end + DEFAULT_CONTEXT
+                    ].replace("\n", " ")
 
                     sig = f"{value}:{context[:60]}"
                     if sig not in seen:
                         seen.add(sig)
                         feature_votes = 0
-                        if 'judgment' in context.lower():
+                        if "judgment" in context.lower():
                             feature_votes += 2
-                        if 'settlement' in context.lower():
+                        if "settlement" in context.lower():
                             feature_votes += 2
-                        if 'penalty' in context.lower():
+                        if "penalty" in context.lower():
                             feature_votes += 1
-                        if 'award' in context.lower():
+                        if "award" in context.lower():
                             feature_votes += 1
 
-                        out.append(Candidate(
-                            value=value,
-                            raw_text=match.group(0),
-                            context=context,
-                            feature_votes=feature_votes
-                        ))
+                        out.append(
+                            Candidate(
+                                value=value,
+                                raw_text=match.group(0),
+                                context=context,
+                                feature_votes=feature_votes,
+                            )
+                        )
             except ValueError:
                 continue
 
@@ -64,14 +70,17 @@ class CaseOutcomeImputer:
 
         amounts = []
         for candidate in candidates[:10]:
-            amounts.append({
-                "value": candidate.value,
-                "raw_text": candidate.raw_text,
-                "context": candidate.context,
-                "feature_votes": candidate.feature_votes
-            })
+            amounts.append(
+                {
+                    "value": candidate.value,
+                    "raw_text": candidate.raw_text,
+                    "context": candidate.context,
+                    "feature_votes": candidate.feature_votes,
+                }
+            )
 
         return amounts
+
 
 def test_cash_amounts():
     """Test cash amounts extraction on various documents."""
@@ -109,7 +118,9 @@ def test_cash_amounts():
                 print(f"Found {len(amounts)} cash amounts:")
 
                 for j, amount in enumerate(amounts, 1):
-                    print(f"  {j}. ${amount['value']:,.0f} (votes: {amount['feature_votes']})")
+                    print(
+                        f"  {j}. ${amount['value']:,.0f} (votes: {amount['feature_votes']})"
+                    )
                     print(f"     Raw: {amount['raw_text']}")
                     print(f"     Context: ...{amount['context'][:120]}...")
             elif i < 5:  # Show first few docs without amounts for context
@@ -117,7 +128,9 @@ def test_cash_amounts():
                 print("No cash amounts found")
 
     print(f"\n{'='*70}")
-    print(f"Summary: {docs_with_amounts} documents with amounts out of {min(10, i+1)} tested")
+    print(
+        f"Summary: {docs_with_amounts} documents with amounts out of {min(10, i+1)} tested"
+    )
     print(f"Total amounts extracted: {total_amounts}")
 
     # Test on some specific text snippets
@@ -137,6 +150,7 @@ def test_cash_amounts():
         for amount in amounts:
             print(f"  ${amount['value']:,.0f} (votes: {amount['feature_votes']})")
             print(f"     Context: {amount['context']}")
+
 
 if __name__ == "__main__":
     test_cash_amounts()

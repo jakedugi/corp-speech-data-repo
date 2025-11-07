@@ -7,10 +7,10 @@ to populate required provenance fields.
 """
 
 import json
+import logging
 import re
 from pathlib import Path
 from typing import Dict, Optional
-import logging
 
 # Setup logging
 logging.basicConfig(

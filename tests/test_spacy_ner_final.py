@@ -6,6 +6,7 @@ Test spaCy NER integration with S&P 500 executive data.
 import sys
 from pathlib import Path
 
+
 def test_spacy_ner_integration():
     """Test spaCy NER with comprehensive S&P 500 data."""
     print("=" * 70)
@@ -13,7 +14,7 @@ def test_spacy_ner_integration():
     print("=" * 70)
 
     # Add paths
-    sys.path.insert(0, str(Path(__file__).parent / 'packages' / 'corpus-types' / 'src'))
+    sys.path.insert(0, str(Path(__file__).parent / "packages" / "corpus_types" / "src"))
 
     try:
         # Load our test config
@@ -41,15 +42,19 @@ def test_spacy_ner_integration():
             patterns = []
 
             # Add company aliases
-            for alias in config['extraction']['company_aliases'][:100]:  # Limit for testing
+            for alias in config["extraction"]["company_aliases"][
+                :100
+            ]:  # Limit for testing
                 patterns.append({"label": "ORG", "pattern": alias})
 
             # Add executive names
-            for exec_name in config['nlp']['executive_names'][:100]:  # Limit for testing
+            for exec_name in config["nlp"]["executive_names"][
+                :100
+            ]:  # Limit for testing
                 patterns.append({"label": "PERSON", "pattern": exec_name})
 
             # Add role keywords
-            for keyword in config['nlp']['role_keywords']:
+            for keyword in config["nlp"]["role_keywords"]:
                 patterns.append({"label": "TITLE", "pattern": keyword})
 
             ruler.add_patterns(patterns)
@@ -61,7 +66,7 @@ def test_spacy_ner_integration():
             "Microsoft's Satya Nadella stated that AI will transform business.",
             "Tesla founder Elon Musk explained the company's strategy.",
             "JPMorgan Chase CEO Jamie Dimon commented on regulatory changes.",
-            "Goldman Sachs board approved the merger proposal."
+            "Goldman Sachs board approved the merger proposal.",
         ]
 
         print(f"\nTesting NER on {len(test_texts)} corporate text samples:")
@@ -75,7 +80,7 @@ def test_spacy_ner_integration():
             doc = nlp(text)
             entities = [(ent.text, ent.label_) for ent in doc.ents]
 
-            print(f"\n{i}. \"{text}\"")
+            print(f'\n{i}. "{text}"')
             print(f"   Found {len(entities)} entities:")
 
             for entity_text, entity_label in entities:
@@ -89,7 +94,7 @@ def test_spacy_ner_integration():
                 elif entity_label == "TITLE":
                     title_entities += 1
 
-        print(f"\n" + "=" * 50)
+        print("\n" + "=" * 50)
         print("NER RESULTS SUMMARY:")
         print(f"  Total entities found: {total_entities}")
         print(f"  Person entities: {person_entities}")
@@ -97,9 +102,10 @@ def test_spacy_ner_integration():
         print(f"  Title entities: {title_entities}")
 
         # Test quote extraction patterns
-        print(f"\nTesting quote extraction patterns...")
+        print("\nTesting quote extraction patterns...")
 
         import re
+
         QUOTE_PATTERN = re.compile(r'"([^"]*)"', re.MULTILINE)
 
         quotes_found = 0
@@ -110,10 +116,13 @@ def test_spacy_ner_integration():
         print(f"Found {quotes_found} quoted passages in test texts")
 
         # Test speaker attribution patterns
-        print(f"\nTesting speaker attribution patterns...")
+        print("\nTesting speaker attribution patterns...")
 
         attribution_patterns = [
-            (r"([A-Z][a-z]+(?: [A-Z][a-z]+)*) (?:stated|said|announced|explained|commented)", "Name + verb"),
+            (
+                r"([A-Z][a-z]+(?: [A-Z][a-z]+)*) (?:stated|said|announced|explained|commented)",
+                "Name + verb",
+            ),
             (r"([A-Z][a-z]+(?: [A-Z][a-z]+)*)'s ([A-Z][a-z]+)", "Possessive pattern"),
             (r"According to ([A-Z][a-z]+(?: [A-Z][a-z]+)*),", "According to pattern"),
             (r"([A-Z][a-z]+(?: [A-Z][a-z]+)*) CEO", "Name + CEO"),
@@ -128,7 +137,7 @@ def test_spacy_ner_integration():
 
         print(f"Found {attributions_found} potential speaker attributions")
 
-        print(f"\n" + "=" * 70)
+        print("\n" + "=" * 70)
         print("🎉 SPACY NER INTEGRATION TEST PASSED!")
         print("✅ S&P 500 executive data loaded")
         print("✅ spaCy NER model working")
@@ -137,9 +146,11 @@ def test_spacy_ner_integration():
         print("✅ Quote extraction patterns functional")
         print("✅ Speaker attribution patterns working")
 
-        print(f"\n📊 Performance metrics:")
+        print("\n📊 Performance metrics:")
         print(f"   - Entities per text: {total_entities/len(test_texts):.1f}")
-        print(f"   - Executive recognition rate: {person_entities/total_entities*100:.1f}% of entities")
+        print(
+            f"   - Executive recognition rate: {person_entities/total_entities*100:.1f}% of entities"
+        )
         print(f"   - Company recognition working: {'✅' if org_entities > 0 else '❌'}")
 
         return True
@@ -147,17 +158,17 @@ def test_spacy_ner_integration():
     except Exception as e:
         print(f"❌ Test failed: {e}")
         import traceback
+
         traceback.print_exc()
         return False
+
 
 if __name__ == "__main__":
     success = test_spacy_ner_integration()
 
     if success:
         print("\n🚀 spaCy NER with S&P 500 data is fully operational!")
-        print("Ready for integration into corpus-extractors pipeline.")
+        print("Ready for integration into corpus_extractors pipeline.")
     else:
         print("\n❌ Test failed")
         sys.exit(1)
-
-

@@ -3,9 +3,9 @@
 Check the current status of the data pipeline without requiring installed dependencies.
 """
 
+import hashlib
 import json
 import pathlib
-import hashlib
 
 
 def blake3_digest(path: pathlib.Path) -> str:
@@ -20,7 +20,7 @@ def count_jsonl_records(path: pathlib.Path) -> int:
     if not path.exists():
         return 0
     try:
-        return sum(1 for _ in path.open('r', encoding='utf-8'))
+        return sum(1 for _ in path.open("r", encoding="utf-8"))
     except Exception:
         return -1
 
@@ -37,9 +37,9 @@ def main():
         "scripts/write_run_log.py",
         "scripts/validate_pipeline.py",
         "configs/query.small.yaml",
-        "packages/corpus-types/src/corpus_types/utils/deterministic_ids.py",
+        "packages/corpus_types/src/corpus_types/utils/deterministic_ids.py",
         "tests/test_data_pipeline_validation.py",
-        "PIPELINE_STATUS.md"
+        "PIPELINE_STATUS.md",
     ]
 
     print("\nCore Files Check:")
@@ -54,7 +54,7 @@ def main():
         "docs.raw.small.jsonl",
         "quotes.small.jsonl",
         "outcomes.small.jsonl",
-        "manifest.json"
+        "manifest.json",
     ]
 
     print("\nFixture Data Check:")
@@ -72,7 +72,7 @@ def main():
     # Check import fixes
     import_issues = 0
     try:
-        with open("fix_imports.py", 'r') as f:
+        with open("fix_imports.py", "r") as f:
             if "corp_speech_risk_dataset" in f.read():
                 import_issues += 1
     except:
@@ -84,7 +84,7 @@ def main():
     # Check CI updates
     ci_updated = False
     try:
-        with open(".github/workflows/ci.yml", 'r') as f:
+        with open(".github/workflows/ci.yml", "r") as f:
             content = f.read()
             if "deterministic" in content and "fixture" in content:
                 ci_updated = True

@@ -13,11 +13,11 @@ Produces:
     - fingerprints: blake3 fingerprints for reproducibility
 """
 
-import sys
-import json
 import hashlib
+import json
 import pathlib
 import subprocess
+import sys
 from datetime import datetime
 
 
@@ -31,8 +31,9 @@ def blake3_digest(path: pathlib.Path) -> str:
 def get_version(cmd: str) -> str:
     """Get version string from command, fallback to 'unknown'."""
     try:
-        result = subprocess.run([cmd, "--version"],
-                              capture_output=True, text=True, timeout=5)
+        result = subprocess.run(
+            [cmd, "--version"], capture_output=True, text=True, timeout=5
+        )
         if result.returncode == 0:
             return result.stdout.strip()
         return "unknown"
@@ -45,7 +46,7 @@ def count_records(path: pathlib.Path) -> int:
     if not path.exists():
         return 0
     try:
-        return sum(1 for _ in path.open('r', encoding='utf-8'))
+        return sum(1 for _ in path.open("r", encoding="utf-8"))
     except Exception:
         return -1
 
@@ -60,13 +61,8 @@ def main():
         print(f"Error: {data_dir} does not exist")
         sys.exit(1)
 
-# Expected artifacts (with fallback to .small versions for fixtures)
-    artifacts = [
-        "docs.raw.jsonl",
-        "docs.norm.jsonl",
-        "quotes.jsonl",
-        "outcomes.jsonl"
-    ]
+    # Expected artifacts (with fallback to .small versions for fixtures)
+    artifacts = ["docs.raw.jsonl", "docs.norm.jsonl", "quotes.jsonl", "outcomes.jsonl"]
 
     # For fixtures directory, also check .small versions
     artifact_mappings = {}
@@ -84,10 +80,10 @@ def main():
 
     # Get tool versions
     versions = {
-        "corpus-types": get_version("corpus-validate"),
-        "corpus-hydrator": get_version("hydrator"),
-        "corpus-cleaner": get_version("cleaner"),
-        "corpus-extractors": get_version("extract"),
+        "corpus_types": get_version("corpus-validate"),
+        "corpus_hydrator": get_version("hydrator"),
+        "corpus_cleaner": get_version("cleaner"),
+        "corpus_extractors": get_version("extract"),
         "python": f"{sys.version_info.major}.{sys.version_info.minor}.{sys.version_info.micro}",
     }
 
@@ -112,50 +108,47 @@ def main():
         "run_id": run_id,
         "generated_at": datetime.utcnow().isoformat() + "Z",
         "data_directory": str(data_dir),
-
         # Pipeline metadata
         "pipeline": {
             "name": "corporate-speech-data-pipeline",
             "version": "1.0.0",
-            "stages": ["hydrate", "clean", "extract", "validate"]
+            "stages": ["hydrate", "clean", "extract", "validate"],
         },
-
         # Tool versions
         "versions": versions,
-
         # Output artifacts
         "artifacts": {
             "expected": artifacts,
             "found": [a for a in artifacts if artifact_mappings[a].exists()],
-            "missing": [a for a in artifacts if not artifact_mappings[a].exists()]
+            "missing": [a for a in artifacts if not artifact_mappings[a].exists()],
         },
-
         # Data statistics
         "statistics": {
             "total_records": total_records,
             "counts": counts,
-            "fingerprints": fingerprints
+            "fingerprints": fingerprints,
         },
-
         # Quality metrics
         "quality": {
             "schema_validated": True,
             "fingerprints_stable": True,  # Would be validated against previous runs
-            "data_integrity": "verified"
+            "data_integrity": "verified",
         },
-
         # Provenance
         "provenance": {
             "environment": {
                 "platform": sys.platform,
                 "python_version": sys.version,
-                "working_directory": str(pathlib.Path.cwd())
+                "working_directory": str(pathlib.Path.cwd()),
             },
             "command": " ".join(sys.argv),
-            "user": "pipeline"
+            "user": "pipeline",
         },
-
-        "status": "success" if all(artifact_mappings[a].exists() for a in artifacts) else "partial"
+        "status": (
+            "success"
+            if all(artifact_mappings[a].exists() for a in artifacts)
+            else "partial"
+        ),
     }
 
     # Write manifest
@@ -165,7 +158,9 @@ def main():
     print(f"Manifest written to {manifest_path}")
     print(f"Run ID: {run_id}")
     print(f"Total Records: {total_records}")
-    print(f"Fingerprints computed: {len([f for f in fingerprints.values() if f != 'file_missing'])}")
+    print(
+        f"Fingerprints computed: {len([f for f in fingerprints.values() if f != 'file_missing'])}"
+    )
     print(f"Output directory: {data_dir}")
     if manifest["artifacts"]["missing"]:
         print(f"WARNING: Missing artifacts: {manifest['artifacts']['missing']}")

@@ -10,14 +10,15 @@ This script tests that:
 5. Basic CLI functionality works
 """
 
+import hashlib
 import json
 import pathlib
 import sys
-import hashlib
+
 from corpus_types.utils.deterministic_ids import (
-    generate_quote_id,
     generate_doc_id,
-    validate_id_uniqueness
+    generate_quote_id,
+    validate_id_uniqueness,
 )
 
 
@@ -26,7 +27,8 @@ def test_imports():
     print("Testing imports...")
 
     try:
-        from corpus_types.schemas.models import Doc, Quote, Outcome
+        from corpus_types.schemas.models import Doc, Outcome, Quote
+
         print("OK corpus_types imports work")
     except ImportError as e:
         print(f"ERROR corpus_types import failed: {e}")
@@ -34,6 +36,7 @@ def test_imports():
 
     try:
         from corpus_api.client.base_api_client import BaseAPIClient
+
         print("OK corpus_api imports work")
     except ImportError as e:
         print(f"ERROR corpus_api import failed: {e}")
@@ -41,6 +44,7 @@ def test_imports():
 
     try:
         from corpus_cleaner.cleaner import TextCleaner
+
         print("OK corpus_cleaner imports work")
     except ImportError as e:
         print(f"ERROR corpus_cleaner import failed: {e}")
@@ -87,7 +91,7 @@ def test_fixture_integrity():
         return False
 
     docs = []
-    with docs_file.open('r') as f:
+    with docs_file.open("r") as f:
         for line in f:
             if line.strip():
                 docs.append(json.loads(line.strip()))
@@ -109,7 +113,7 @@ def test_fixture_integrity():
         return False
 
     quotes = []
-    with quotes_file.open('r') as f:
+    with quotes_file.open("r") as f:
         for line in f:
             if line.strip():
                 quotes.append(json.loads(line.strip()))
@@ -127,13 +131,17 @@ def test_fixture_integrity():
 
     # Test ID uniqueness
     doc_ids_list = [doc["doc_id"] for doc in docs]
-    is_unique, duplicates = validate_id_uniqueness([{"id": id} for id in doc_ids_list], "id")
+    is_unique, duplicates = validate_id_uniqueness(
+        [{"id": id} for id in doc_ids_list], "id"
+    )
     if not is_unique:
         print(f"ERROR Duplicate document IDs: {duplicates}")
         return False
 
     quote_ids_list = [quote["quote_id"] for quote in quotes]
-    is_unique, duplicates = validate_id_uniqueness([{"id": id} for id in quote_ids_list], "id")
+    is_unique, duplicates = validate_id_uniqueness(
+        [{"id": id} for id in quote_ids_list], "id"
+    )
     if not is_unique:
         print(f"ERROR Duplicate quote IDs: {duplicates}")
         return False
@@ -150,9 +158,12 @@ def test_manifest_generation():
 
     # Generate manifest
     import subprocess
-    result = subprocess.run([
-        sys.executable, "scripts/write_manifest.py", str(fixtures_dir)
-    ], capture_output=True, text=True)
+
+    result = subprocess.run(
+        [sys.executable, "scripts/write_manifest.py", str(fixtures_dir)],
+        capture_output=True,
+        text=True,
+    )
 
     if result.returncode != 0:
         print(f"ERROR Manifest generation failed: {result.stderr}")
@@ -165,7 +176,7 @@ def test_manifest_generation():
         return False
 
     # Validate manifest content
-    with manifest_file.open('r') as f:
+    with manifest_file.open("r") as f:
         manifest = json.load(f)
 
     required_keys = ["generated_at", "versions", "artifacts", "counts", "fingerprints"]
@@ -186,6 +197,7 @@ def test_text_cleaner():
 
     try:
         from corpus_cleaner.cleaner import TextCleaner
+
         cleaner = TextCleaner()
 
         test_text = "Hello   world\n\nwith  extra    spaces."

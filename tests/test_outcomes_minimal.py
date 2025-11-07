@@ -7,17 +7,19 @@ Tests just the core logic without full module imports.
 import json
 import re
 from pathlib import Path
-from typing import List, NamedTuple, Dict, Any
+from typing import Any, Dict, List, NamedTuple
 
 # Copy the core classes and functions needed for testing
 DEFAULT_MIN = 10000
 DEFAULT_CONTEXT = 100
+
 
 class Candidate(NamedTuple):
     value: float
     raw_text: str
     context: str
     feature_votes: int
+
 
 class AmountSelector:
     def choose(self, candidates: List[Candidate]) -> float | None:
@@ -27,6 +29,7 @@ class AmountSelector:
             candidates, key=lambda c: (c.feature_votes, c.value), reverse=True
         )
         return sorted_candidates[0].value
+
 
 class CaseOutcomeImputer:
     def __init__(self, config: dict = None):
@@ -54,14 +57,19 @@ class CaseOutcomeImputer:
                 "court_type": court_info.get("court_type"),
                 "is_dismissed": court_info.get("is_dismissed", False),
                 "has_fee_shifting": court_info.get("has_fee_shifting", False),
-                "candidates": [
-                    {
-                        "value": c.value,
-                        "raw_text": c.raw_text,
-                        "context": c.context,
-                        "feature_votes": c.feature_votes
-                    } for c in candidates[:5]
-                ] if candidates else []
+                "candidates": (
+                    [
+                        {
+                            "value": c.value,
+                            "raw_text": c.raw_text,
+                            "context": c.context,
+                            "feature_votes": c.feature_votes,
+                        }
+                        for c in candidates[:5]
+                    ]
+                    if candidates
+                    else []
+                ),
             }
             outcomes.append(outcome)
 
@@ -70,36 +78,40 @@ class CaseOutcomeImputer:
     def scan_for_candidates_from_text(self, text: str, doc_id: str) -> List[Candidate]:
         seen = set()
         out = []
-        dollar_pattern = re.compile(r'\$[\d,]+(?:\.\d{2})?')
+        dollar_pattern = re.compile(r"\$[\d,]+(?:\.\d{2})?")
 
         for match in dollar_pattern.finditer(text):
             try:
-                amount_str = match.group(0).replace('$', '').replace(',', '')
+                amount_str = match.group(0).replace("$", "").replace(",", "")
                 value = float(amount_str)
 
                 if value >= DEFAULT_MIN:
                     start, end = match.span()
-                    context = text[max(0, start - DEFAULT_CONTEXT):end + DEFAULT_CONTEXT].replace('\n', ' ')
+                    context = text[
+                        max(0, start - DEFAULT_CONTEXT) : end + DEFAULT_CONTEXT
+                    ].replace("\n", " ")
 
                     sig = f"{value}:{context[:60]}"
                     if sig not in seen:
                         seen.add(sig)
                         feature_votes = 0
-                        if 'judgment' in context.lower():
+                        if "judgment" in context.lower():
                             feature_votes += 2
-                        if 'settlement' in context.lower():
+                        if "settlement" in context.lower():
                             feature_votes += 2
-                        if 'penalty' in context.lower():
+                        if "penalty" in context.lower():
                             feature_votes += 1
-                        if 'award' in context.lower():
+                        if "award" in context.lower():
                             feature_votes += 1
 
-                        out.append(Candidate(
-                            value=value,
-                            raw_text=match.group(0),
-                            context=context,
-                            feature_votes=feature_votes
-                        ))
+                        out.append(
+                            Candidate(
+                                value=value,
+                                raw_text=match.group(0),
+                                context=context,
+                                feature_votes=feature_votes,
+                            )
+                        )
             except ValueError:
                 continue
 
@@ -108,24 +120,28 @@ class CaseOutcomeImputer:
     def _classify_outcome_type(self, text: str) -> str | None:
         text_lower = text.lower()
 
-        if 'stipulated judgment' in text_lower or 'consent judgment' in text_lower:
-            return 'stipulated_judgment'
-        elif 'dismissed' in text_lower and ('with prejudice' in text_lower or 'without prejudice' in text_lower):
-            return 'dismissal'
-        elif 'settlement' in text_lower or 'settled' in text_lower:
-            return 'settlement'
-        elif 'judgment' in text_lower and 'default' in text_lower:
-            return 'default_judgment'
-        elif 'summary judgment' in text_lower:
-            return 'summary_judgment'
-        elif 'jury verdict' in text_lower or 'jury found' in text_lower:
-            return 'jury_verdict'
-        elif 'bench trial' in text_lower or 'court finds' in text_lower:
-            return 'bench_judgment'
-        elif 'consent decree' in text_lower:
-            return 'consent_decree'
-        elif 'injunction' in text_lower and ('permanent' in text_lower or 'preliminary' in text_lower):
-            return 'injunctive_relief'
+        if "stipulated judgment" in text_lower or "consent judgment" in text_lower:
+            return "stipulated_judgment"
+        elif "dismissed" in text_lower and (
+            "with prejudice" in text_lower or "without prejudice" in text_lower
+        ):
+            return "dismissal"
+        elif "settlement" in text_lower or "settled" in text_lower:
+            return "settlement"
+        elif "judgment" in text_lower and "default" in text_lower:
+            return "default_judgment"
+        elif "summary judgment" in text_lower:
+            return "summary_judgment"
+        elif "jury verdict" in text_lower or "jury found" in text_lower:
+            return "jury_verdict"
+        elif "bench trial" in text_lower or "court finds" in text_lower:
+            return "bench_judgment"
+        elif "consent decree" in text_lower:
+            return "consent_decree"
+        elif "injunction" in text_lower and (
+            "permanent" in text_lower or "preliminary" in text_lower
+        ):
+            return "injunctive_relief"
 
         return None
 
@@ -133,29 +149,28 @@ class CaseOutcomeImputer:
         court_info = {
             "court_type": None,
             "is_dismissed": False,
-            "has_fee_shifting": False
+            "has_fee_shifting": False,
         }
 
         text_lower = text.lower()
 
-        if 'district court' in text_lower:
+        if "district court" in text_lower:
             court_info["court_type"] = "district"
-        elif 'court of appeals' in text_lower or 'circuit court' in text_lower:
+        elif "court of appeals" in text_lower or "circuit court" in text_lower:
             court_info["court_type"] = "appeals"
-        elif 'supreme court' in text_lower:
+        elif "supreme court" in text_lower:
             court_info["court_type"] = "supreme"
-        elif 'bankruptcy court' in text_lower:
+        elif "bankruptcy court" in text_lower:
             court_info["court_type"] = "bankruptcy"
 
-        court_info["is_dismissed"] = (
-            'dismissed' in text_lower and
-            ('with prejudice' in text_lower or 'without prejudice' in text_lower)
+        court_info["is_dismissed"] = "dismissed" in text_lower and (
+            "with prejudice" in text_lower or "without prejudice" in text_lower
         )
 
         court_info["has_fee_shifting"] = (
-            ('attorney' in text_lower and 'fee' in text_lower) or
-            'fee shifting' in text_lower or
-            'prevailing party' in text_lower
+            ("attorney" in text_lower and "fee" in text_lower)
+            or "fee shifting" in text_lower
+            or "prevailing party" in text_lower
         )
 
         return court_info
@@ -165,14 +180,17 @@ class CaseOutcomeImputer:
 
         amounts = []
         for candidate in candidates[:10]:
-            amounts.append({
-                "value": candidate.value,
-                "raw_text": candidate.raw_text,
-                "context": candidate.context,
-                "feature_votes": candidate.feature_votes
-            })
+            amounts.append(
+                {
+                    "value": candidate.value,
+                    "raw_text": candidate.raw_text,
+                    "context": candidate.context,
+                    "feature_votes": candidate.feature_votes,
+                }
+            )
 
         return amounts
+
 
 def test_outcome_extraction():
     """Test outcome extraction on sample documents."""
@@ -206,9 +224,11 @@ def test_outcome_extraction():
                     print(f"Is Dismissed: {outcome.get('is_dismissed')}")
                     print(f"Has Fee Shifting: {outcome.get('has_fee_shifting')}")
                     print(f"Number of candidates: {len(outcome.get('candidates', []))}")
-                    if outcome.get('candidates'):
-                        top_candidate = outcome['candidates'][0]
-                        print(f"Top candidate: ${top_candidate['value']:,.0f} (votes: {top_candidate['feature_votes']})")
+                    if outcome.get("candidates"):
+                        top_candidate = outcome["candidates"][0]
+                        print(
+                            f"Top candidate: ${top_candidate['value']:,.0f} (votes: {top_candidate['feature_votes']})"
+                        )
                         print(f"Context: ...{top_candidate['context'][:100]}...")
             else:
                 print("No outcomes extracted")
@@ -235,6 +255,7 @@ def test_outcome_extraction():
             print(f"Feature Votes: {amount['feature_votes']}")
             print(f"Context: ...{amount['context'][:150]}...")
             print()
+
 
 if __name__ == "__main__":
     test_outcome_extraction()

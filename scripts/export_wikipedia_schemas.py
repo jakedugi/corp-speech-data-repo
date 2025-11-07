@@ -8,19 +8,20 @@ to support external validation and documentation.
 
 import json
 from pathlib import Path
+
 from corpus_types.schemas import (
-    WikipediaKeyPerson,
-    WikipediaCompany,
-    WikipediaExtractionResult,
-    WikipediaScrapingConfig,
-    WikipediaContentConfig,
-    WikipediaIndexConfig,
-    WikipediaKeyPeopleConfig,
+    DatasetManifest,
+    NormalizedAppointment,
     NormalizedCompany,
     NormalizedPerson,
     NormalizedRole,
-    NormalizedAppointment,
-    DatasetManifest,
+    WikipediaCompany,
+    WikipediaContentConfig,
+    WikipediaExtractionResult,
+    WikipediaIndexConfig,
+    WikipediaKeyPeopleConfig,
+    WikipediaKeyPerson,
+    WikipediaScrapingConfig,
 )
 from corpus_types.utils.export_schema import export_model_schema
 

@@ -11,13 +11,14 @@ This script provides detailed coverage analysis to understand:
 - Sample weight distribution by class
 """
 
-import json
-import pandas as pd
-import numpy as np
-from pathlib import Path
-from typing import Dict, Any, List, Tuple
-from collections import defaultdict, Counter
 import argparse
+import json
+from collections import Counter, defaultdict
+from pathlib import Path
+from typing import Any, Dict, List, Tuple
+
+import numpy as np
+import pandas as pd
 
 
 class LabelCoverageAnalyzer:

@@ -13,10 +13,11 @@ Critical for determining if we can fix the speaker leakage problem.
 
 import json
 import re
-import numpy as np
-from collections import defaultdict, Counter
+from collections import Counter, defaultdict
 from pathlib import Path
 from typing import Dict, List, Set, Tuple
+
+import numpy as np
 
 
 def extract_case_id(src_path: str) -> str:

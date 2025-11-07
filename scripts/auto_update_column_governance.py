@@ -19,10 +19,11 @@ For review only (no changes):
 """
 
 import argparse
-import pandas as pd
-from pathlib import Path
 import re
-from typing import List, Dict
+from pathlib import Path
+from typing import Dict, List
+
+import pandas as pd
 
 
 def load_test_results(results_file: str) -> pd.DataFrame:

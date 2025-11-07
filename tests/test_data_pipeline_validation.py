@@ -9,13 +9,14 @@ import json
 import pathlib
 import subprocess
 import tempfile
+
 import pytest
 from corpus_types.utils.deterministic_ids import (
-    generate_quote_id,
     generate_case_id,
     generate_doc_id,
+    generate_quote_id,
+    sort_records_by_id,
     validate_id_uniqueness,
-    sort_records_by_id
 )
 
 
@@ -25,7 +26,7 @@ class TestDataPipelineValidation:
     @pytest.fixture
     def fixtures_dir(self):
         """Get path to fixtures directory."""
-        return pathlib.Path("corpus_types/fixtures")
+        return pathlib.Path("packages/corpus_types/fixtures")
 
     @pytest.fixture
     def sample_doc(self):
@@ -44,8 +45,8 @@ class TestDataPipelineValidation:
                 "request": {"endpoint": "test"},
                 "response": {"http_status": 200, "sha256": "test", "bytes": 100},
                 "adapter": {"name": "test", "version": "1.0.0"},
-                "provider": {"source": "test"}
-            }
+                "provider": {"source": "test"},
+            },
         }
 
     def test_deterministic_id_generation(self):
@@ -96,7 +97,7 @@ class TestDataPipelineValidation:
         assert docs_file.exists()
 
         docs = []
-        with docs_file.open('r') as f:
+        with docs_file.open("r") as f:
             for line in f:
                 docs.append(json.loads(line.strip()))
 
@@ -114,7 +115,7 @@ class TestDataPipelineValidation:
         assert quotes_file.exists()
 
         quotes = []
-        with quotes_file.open('r') as f:
+        with quotes_file.open("r") as f:
             for line in f:
                 quotes.append(json.loads(line.strip()))
 
@@ -134,15 +135,15 @@ class TestDataPipelineValidation:
         quotes = []
         outcomes = []
 
-        with (fixtures_dir / "docs.raw.small.jsonl").open('r') as f:
+        with (fixtures_dir / "docs.raw.small.jsonl").open("r") as f:
             for line in f:
                 docs.append(json.loads(line.strip()))
 
-        with (fixtures_dir / "quotes.small.jsonl").open('r') as f:
+        with (fixtures_dir / "quotes.small.jsonl").open("r") as f:
             for line in f:
                 quotes.append(json.loads(line.strip()))
 
-        with (fixtures_dir / "outcomes.small.jsonl").open('r') as f:
+        with (fixtures_dir / "outcomes.small.jsonl").open("r") as f:
             for line in f:
                 outcomes.append(json.loads(line.strip()))
 
@@ -151,14 +152,19 @@ class TestDataPipelineValidation:
 
         # Check that all quote doc_ids exist in documents
         for quote in quotes:
-            assert quote["doc_id"] in doc_ids, f"Quote references non-existent doc_id: {quote['doc_id']}"
+            assert (
+                quote["doc_id"] in doc_ids
+            ), f"Quote references non-existent doc_id: {quote['doc_id']}"
 
     def test_manifest_generation(self, fixtures_dir):
         """Test manifest generation works correctly."""
         # Run manifest generation
-        result = subprocess.run([
-            "python3", "scripts/write_manifest.py", str(fixtures_dir)
-        ], capture_output=True, text=True, cwd=pathlib.Path.cwd())
+        result = subprocess.run(
+            ["python3", "scripts/write_manifest.py", str(fixtures_dir)],
+            capture_output=True,
+            text=True,
+            cwd=pathlib.Path.cwd(),
+        )
 
         assert result.returncode == 0
 
@@ -166,7 +172,7 @@ class TestDataPipelineValidation:
         manifest_file = fixtures_dir / "manifest.json"
         assert manifest_file.exists()
 
-        with manifest_file.open('r') as f:
+        with manifest_file.open("r") as f:
             manifest = json.load(f)
 
         # Validate manifest structure
@@ -177,7 +183,12 @@ class TestDataPipelineValidation:
         assert "fingerprints" in manifest
 
         # Check that all expected artifacts are present
-        expected_artifacts = ["docs.raw.jsonl", "docs.norm.jsonl", "quotes.jsonl", "outcomes.jsonl"]
+        expected_artifacts = [
+            "docs.raw.jsonl",
+            "docs.norm.jsonl",
+            "quotes.jsonl",
+            "outcomes.jsonl",
+        ]
         for artifact in expected_artifacts:
             assert artifact in manifest["artifacts"]
 
@@ -185,7 +196,7 @@ class TestDataPipelineValidation:
         """Test that corpus-validate CLI works on fixtures."""
         # This would test the actual CLI if it were working
         # For now, just check that the validation script exists
-        validate_script = pathlib.Path("corpus_types/cli/validate.py")
+        validate_script = pathlib.Path("packages/corpus_types/cli/validate.py")
         assert validate_script.exists()
 
         # Check the script has the expected structure
@@ -194,7 +205,9 @@ class TestDataPipelineValidation:
 
     def test_offline_mode_availability(self):
         """Test that offline mode is available in the fetch CLI."""
-        fetch_script = pathlib.Path("corpus_api/cli/fetch.py")
+        fetch_script = pathlib.Path(
+            "packages/corpus_hydrator/src/corpus_hydrator/cli/fetch.py"
+        )
         assert fetch_script.exists()
 
         content = fetch_script.read_text()

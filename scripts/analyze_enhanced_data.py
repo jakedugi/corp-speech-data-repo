@@ -5,7 +5,7 @@ Analyze enhanced data to confirm case counts and outcome distributions.
 
 import json
 import re
-from collections import defaultdict, Counter
+from collections import Counter, defaultdict
 
 
 def extract_case_id(src_path: str) -> str:

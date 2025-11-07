@@ -8,8 +8,8 @@ Usage:
 Appends to RUN.md with timestamp and command details.
 """
 
-import sys
 import pathlib
+import sys
 from datetime import datetime
 
 
@@ -26,6 +26,7 @@ def main():
 
     # Get environment info
     import os
+
     env_info = f"""
 ## Execution: {make_target} at {timestamp}
 
@@ -48,7 +49,7 @@ make {make_target}
 """
 
     # Append to RUN.md
-    with run_md.open('a', encoding='utf-8') as f:
+    with run_md.open("a", encoding="utf-8") as f:
         f.write(env_info)
 
     print(f"Run log appended to {run_md}")

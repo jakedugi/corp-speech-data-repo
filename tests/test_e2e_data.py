@@ -5,13 +5,14 @@ Tests that the full pipeline (fetch → normalize → extract → validate) work
 and produces deterministic, valid outputs.
 """
 
-import subprocess
-import json
 import hashlib
+import json
 import pathlib
-import pytest
-import tempfile
 import shutil
+import subprocess
+import tempfile
+
+import pytest
 
 
 def blake3_digest(path: pathlib.Path) -> str:
@@ -25,7 +26,7 @@ def count_jsonl_records(path: pathlib.Path) -> int:
     """Count records in JSONL file."""
     if not path.exists():
         return 0
-    return sum(1 for _ in path.open('r', encoding='utf-8'))
+    return sum(1 for _ in path.open("r", encoding="utf-8"))
 
 
 @pytest.fixture
@@ -63,9 +64,11 @@ def test_manifest_script():
     fixtures_dir = pathlib.Path("corpus_types/fixtures")
 
     # Run manifest script
-    result = subprocess.run([
-        "python", "scripts/write_manifest.py", str(fixtures_dir)
-    ], capture_output=True, text=True)
+    result = subprocess.run(
+        ["python", "scripts/write_manifest.py", str(fixtures_dir)],
+        capture_output=True,
+        text=True,
+    )
 
     assert result.returncode == 0
 
@@ -74,7 +77,7 @@ def test_manifest_script():
     assert manifest_path.exists()
 
     # Validate manifest content
-    with manifest_path.open('r') as f:
+    with manifest_path.open("r") as f:
         manifest = json.load(f)
 
     required_keys = ["generated_at", "versions", "artifacts", "counts", "fingerprints"]
@@ -89,9 +92,7 @@ def test_manifest_script():
 
 def test_makefile_targets():
     """Test that Makefile targets exist and are syntactically correct."""
-    result = subprocess.run([
-        "make", "-n", "help"
-    ], capture_output=True, text=True)
+    result = subprocess.run(["make", "-n", "help"], capture_output=True, text=True)
 
     # Should not error (exit code 0 means syntax is OK)
     assert result.returncode == 0

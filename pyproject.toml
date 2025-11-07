@@ -129,6 +129,7 @@ dependencies = [
   "black>=23.0.0",
   "isort>=5.0.0",
   "mypy>=1.0.0",
+  "types-PyYAML",
   "pytest>=8.4.1",
   "pytest-cov>=4.0.0",
   "pytest-asyncio",
@@ -196,22 +197,22 @@ explicit = true
 
 [tool.black]
 line-length = 88
-target-version = ["py38"]
+target-version = ["py311"]
 
 [tool.isort]
 profile = "black"
 multi_line_output = 3
 
-# fix?
 [tool.mypy]
 python_version = "3.11"
 strict = true
 ignore_missing_imports = true
+namespace_packages = true
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
 python_files = ["test_*.py"]
-python_paths = ["packages/corpus-cleaner/src", "packages/corpus-extractors/src", "packages/corpus-hydrator/src", "packages/corpus-types/src"]
+python_paths = ["packages/corpus_cleaner/src", "packages/corpus_extractors/src", "packages/corpus_hydrator/src", "packages/corpus_types/src"]
 
 
 [tool.setuptools]
@@ -219,9 +220,9 @@ package-dir = {"" = "."}
 
 [tool.setuptools.packages.find]
 where = [
-  "packages/corpus-hydrator/src",
-  "packages/corpus-types/src",
-  "packages/corpus-extractors/src",
-  "packages/corpus-cleaner/src",
+  "packages/corpus_hydrator/src",
+  "packages/corpus_types/src",
+  "packages/corpus_extractors/src",
+  "packages/corpus_cleaner/src",
 ]
 include = ["corpus_*"]

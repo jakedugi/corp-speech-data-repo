@@ -8,6 +8,7 @@ Script to clean and normalize S&P 500 official names for legal risk dataset.
 """
 
 import re
+
 import pandas as pd
 
 # 1. Load the data
