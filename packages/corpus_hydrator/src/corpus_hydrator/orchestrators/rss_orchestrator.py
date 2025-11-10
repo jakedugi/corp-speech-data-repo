@@ -4,8 +4,8 @@ import json
 from pathlib import Path
 from typing import List, Optional
 
-from corp_speech_risk_dataset.api.adapters.rss.rss_client import RSSClient
-from corpus_api.config.rss_config import RSS_FEEDS
+from corpus_hydrator.adapters.rss.rss_client import RSSClient
+from corpus_hydrator.config.rss_config import RSS_FEEDS
 from corpus_types.schemas.models import APIConfig
 from loguru import logger
 

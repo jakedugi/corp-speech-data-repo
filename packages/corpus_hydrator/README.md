@@ -36,10 +36,10 @@ corpus-fetch courtlistener --query configs/query.example.yaml --output data/docs
 corpus-fetch rss --feeds configs/sources/rss.yaml --output data/rss_docs.jsonl
 ```
 
-### Wikipedia
+### Wikipedia Key People
 ```bash
-# Scrape Wikipedia pages
-corpus-fetch wikipedia --pages configs/sources/wikipedia.yaml --output data/wiki_docs.jsonl
+# Scrape executive data from market indexes
+python -m corpus_hydrator.adapters.wikipedia_key_people.cli.commands --index sp500 --max-companies 10 --verbose
 ```
 
 ## Configuration
@@ -75,13 +75,14 @@ authentication:
 ## Module Structure
 
 ```
-corpus_api/
+corpus_hydrator/
 ├── cli/
 │   └── fetch.py              # Main CLI interface
 ├── adapters/
 │   ├── courtlistener/        # CourtListener API client
 │   ├── rss/                  # RSS feed client
-│   └── wikipedia/            # Wikipedia scraper
+│   ├── index_constituents/   # Market index data
+│   └── wikipedia_key_people/ # Executive leadership scraper
 ├── client/                   # Base HTTP client classes
 ├── config/                   # Configuration loading
 ├── orchestrators/            # High-level orchestration
@@ -114,12 +115,12 @@ client = RSSClient()
 documents = client.fetch_feed("https://www.sec.gov/rss/news/press")
 ```
 
-### Wikipedia Scraper
+### Wikipedia Key People Scraper
 ```python
-from corpus_api.adapters.wikipedia.sandp_scraper import WikipediaScraper
+from corpus_hydrator.adapters.wikipedia_key_people.cli.commands import scrape_index_normalized
 
-scraper = WikipediaScraper()
-content = scraper.scrape_page("Corporate_law")
+# Scrape executive data from S&P 500 companies
+scrape_index_normalized(index="sp500", max_companies=10, verbose=True)
 ```
 
 ## Data Format

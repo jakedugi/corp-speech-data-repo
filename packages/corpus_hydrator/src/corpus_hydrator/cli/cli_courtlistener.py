@@ -352,6 +352,44 @@ def search(
         raise typer.Exit(1)
 
 
+def process_statutes(
+    statutes: list[str],
+    config,
+    pages: int,
+    page_size: int,
+    date_min: str | None,
+    output_dir,
+    api_mode: str,
+    company_file: str | None,
+    chunk_size: int,
+):
+    """Process statutes for batch searching."""
+    from ..adapters.courtlistener.usecase import CourtListenerUseCase
+    from pathlib import Path
+
+    # Create usecase and run for each statute
+    for statute in statutes:
+        logger.info(f"Processing statute: {statute}")
+
+        usecase = CourtListenerUseCase(
+            config=config,
+            statutes=[statute],
+            company_file=Path(company_file) if company_file else None,
+            outdir=output_dir,
+            pages=pages,
+            page_size=page_size,
+            date_min=date_min,
+            api_mode=api_mode,
+            chunk_size=chunk_size,
+        )
+
+        try:
+            usecase.run()
+        except Exception as e:
+            logger.error(f"Error processing statute {statute}: {e}")
+            continue
+
+
 def main():
     """Main entry point for the CLI."""
     app()

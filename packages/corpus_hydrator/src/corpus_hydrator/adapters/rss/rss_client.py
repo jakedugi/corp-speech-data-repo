@@ -72,6 +72,16 @@ class RSSClient:
         entries = self.fetch(ticker, limit=limit)
         self.save(ticker, entries, output_dir)
 
+    def fetch_feed(self, url: str, limit: Optional[int] = None) -> List[Dict[str, Any]]:
+        """
+        Fetch RSS entries from a single feed URL. Returns a list of dicts.
+        If `limit` is provided, truncates the list.
+        """
+        entries = self.core.parse_feed(url)
+        if limit is not None:
+            return entries[:limit]
+        return entries
+
     @staticmethod
     def _slug(text: str) -> str:
         """Make filesystem-safe slug from text."""

@@ -114,6 +114,17 @@ class WikipediaCompany(BaseModel):
         ..., description="Index this company belongs to (sp500, dow, etc.)"
     )
 
+    # Business metadata from index
+    sector: Optional[str] = Field(None, description="Company GICS sector")
+    industry: Optional[str] = Field(None, description="Company GICS industry/sub-industry")
+    date_added: Optional[str] = Field(None, description="Date company was added to index")
+    extracted_at: datetime = Field(
+        default_factory=datetime.now, description="When index data was extracted"
+    )
+    source_url: str = Field(
+        ..., description="Wikipedia index page URL where data was sourced"
+    )
+
     # Processing metadata
     processed_at: datetime = Field(
         default_factory=datetime.now, description="When this company was processed"
@@ -482,6 +493,18 @@ class NormalizedCompany(BaseModel):
         None, description="Wikidata QID (Q followed by digits)"
     )
     index_name: str = Field(..., description="Index this company belongs to")
+
+    # Business metadata from index
+    sector: Optional[str] = Field(None, description="Company GICS sector")
+    industry: Optional[str] = Field(None, description="Company GICS industry/sub-industry")
+    date_added: Optional[str] = Field(None, description="Date company was added to index")
+    extracted_at: datetime = Field(
+        default_factory=datetime.now, description="When index data was extracted"
+    )
+    source_url: str = Field(
+        ..., description="Wikipedia index page URL where data was sourced"
+    )
+
     processed_at: datetime = Field(
         default_factory=datetime.now, description="When this record was processed"
     )

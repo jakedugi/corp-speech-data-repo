@@ -5,7 +5,7 @@ from __future__ import annotations
 from typing import Any, Dict, List
 
 import feedparser
-from corpus_api.config.rss_config import RSS_FEEDS
+from corpus_hydrator.config.rss_config import RSS_FEEDS
 
 
 class RSSCore:

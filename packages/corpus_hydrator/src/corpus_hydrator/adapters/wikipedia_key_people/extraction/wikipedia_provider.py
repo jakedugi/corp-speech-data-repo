@@ -9,9 +9,9 @@ import logging
 from pathlib import Path
 from typing import Any, Mapping
 
-from ..config import get_index_config
-from ..utils.http import HttpClient
-from .base import IndexProvider, ProviderError
+from corpus_hydrator.adapters.wikipedia_key_people.config import get_index_config
+from corpus_hydrator.adapters.wikipedia_key_people.utils.http import HttpClient
+from .providers.base import IndexProvider, ProviderError
 
 logger = logging.getLogger(__name__)
 

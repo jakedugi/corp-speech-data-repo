@@ -12,6 +12,16 @@ from typing import Any, Dict, List, Optional
 logger = logging.getLogger(__name__)
 
 
+class ProviderError(Exception):
+    """Base exception for provider-related errors."""
+
+    def __init__(self, provider_name: str, index_key: str, message: str):
+        self.provider_name = provider_name
+        self.index_key = index_key
+        self.message = message
+        super().__init__(f"{provider_name} failed for {index_key}: {message}")
+
+
 class BaseWikipediaProvider(ABC):
     """Base class for Wikipedia data providers."""
 

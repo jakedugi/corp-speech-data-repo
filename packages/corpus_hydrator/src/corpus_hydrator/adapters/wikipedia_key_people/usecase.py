@@ -219,6 +219,10 @@ class WikipediaKeyPeopleUseCase:
         output_dir: str = "data",
         max_companies: Optional[int] = None,
         workers: int = 1,
+        extract_companies: bool = True,
+        extract_people: bool = True,
+        extract_roles: bool = True,
+        extract_appointments: bool = True,
     ) -> Dict[str, Any]:
         """
         Extract key people data in normalized table format for production use.
@@ -249,36 +253,41 @@ class WikipediaKeyPeopleUseCase:
         # Convert to normalized format
         writer = WikipediaKeyPeopleWriter(output_dir)
         companies_norm, people_norm, roles_norm, appointments_norm = (
-            writer.convert_legacy_to_normalized(normalized_people, index_name)
+            writer.convert_legacy_to_normalized(normalized_people, index_name, companies)
         )
 
         # Write normalized tables with deterministic sorting and manifests
         result = writer.write_normalized_tables_with_manifest(
-            companies_norm,
-            people_norm,
-            roles_norm,
-            appointments_norm,
+            companies_norm if extract_companies else [],
+            people_norm if extract_people else [],
+            roles_norm if extract_roles else [],
+            appointments_norm if extract_appointments else [],
             dataset_name=f"{index_name}_key_people",
             output_dir=output_dir,
             provider_order=["wikipedia"],
         )
         manifest = result["manifest"]
 
+        output_files = []
+        if extract_companies:
+            output_files.append(f"{index_name}_key_people_companies.csv")
+        if extract_people:
+            output_files.append(f"{index_name}_key_people_people.csv")
+        if extract_roles:
+            output_files.append(f"{index_name}_key_people_roles.csv")
+        if extract_appointments:
+            output_files.append(f"{index_name}_key_people_appointments.csv")
+        output_files.append(f"{index_name}_key_people_manifest.json")
+
         result = {
             "index_name": index_name,
             "companies_processed": len(companies),
-            "companies_successful": len(companies_norm),
-            "people_extracted": len(people_norm),
-            "roles_identified": len(roles_norm),
-            "appointments_created": len(appointments_norm),
+            "companies_successful": len(companies_norm) if extract_companies else 0,
+            "people_extracted": len(people_norm) if extract_people else 0,
+            "roles_identified": len(roles_norm) if extract_roles else 0,
+            "appointments_created": len(appointments_norm) if extract_appointments else 0,
             "manifest": manifest,
-            "output_files": [
-                f"{index_name}_key_people_companies.csv",
-                f"{index_name}_key_people_people.csv",
-                f"{index_name}_key_people_roles.csv",
-                f"{index_name}_key_people_appointments.csv",
-                f"{index_name}_key_people_manifest.json",
-            ],
+            "output_files": output_files,
         }
 
         logger.info(f"Normalized extraction completed for {index_name}")
@@ -287,29 +296,72 @@ class WikipediaKeyPeopleUseCase:
     def _extract_companies_from_index(
         self, index_name: str, max_companies: Optional[int] = None
     ) -> List[WikipediaCompany]:
-        """Extract company list from index in normalized format."""
+        """Extract company list from index in normalized format with full business metadata."""
         try:
-            # Use existing link extractor to get companies
-            # Pass the scraper config from the main config
-            link_extractor = WikipediaLinkExtractor(self.config.scraper)
-            companies_data = link_extractor.extract_company_links(index_name)
+            from datetime import datetime
+            from .extraction.index_extraction import extract_index
 
+            # Use the full index constituents extraction to get business metadata
+            from .extraction.wikipedia_provider import WikipediaProvider
+            from .extraction.html_table_parser import HtmlTableParser
+
+            provider = WikipediaProvider()
+            parser = HtmlTableParser()
+            result = extract_index(index_name, provider, parser)
+
+            if not result.success or not result.constituents:
+                logger.warning(f"No constituents found for {index_name}, falling back to basic extraction")
+                # Fallback to basic extraction
+                link_extractor = WikipediaLinkExtractor(self.config.scraper)
+                companies_data = link_extractor.extract_company_links(index_name)
+
+                companies = []
+                for i, company_data in enumerate(companies_data):
+                    if max_companies and i >= max_companies:
+                        break
+
+                    company = WikipediaCompany(
+                        ticker=company_data["ticker"],
+                        company_name=company_data["company_name"],
+                        wikipedia_url=company_data["wikipedia_url"],
+                        index_name=index_name,
+                        processed_at=datetime.now(),
+                        key_people_count=0,
+                        processing_success=True,
+                        # Add empty business fields
+                        sector=None,
+                        industry=None,
+                        date_added=None,
+                        extracted_at=datetime.now(),
+                        source_url=f"https://en.wikipedia.org/wiki/{index_name.replace(' ', '_')}"
+                    )
+                    companies.append(company)
+                return companies
+
+            # Use the full constituent data
             companies = []
-            for i, company_data in enumerate(companies_data):
+            for i, constituent in enumerate(result.constituents):
                 if max_companies and i >= max_companies:
                     break
 
                 company = WikipediaCompany(
-                    ticker=company_data["ticker"],
-                    company_name=company_data["company_name"],
-                    wikipedia_url=company_data["wikipedia_url"],
+                    ticker=constituent.symbol,
+                    company_name=constituent.company_name,
+                    wikipedia_url=constituent.wikipedia_url if hasattr(constituent, 'wikipedia_url') else f"https://en.wikipedia.org/wiki/{constituent.company_name.replace(' ', '_')}",
                     index_name=index_name,
                     processed_at=datetime.now(),
                     key_people_count=0,
                     processing_success=True,
+                    # Add business metadata
+                    sector=constituent.sector,
+                    industry=constituent.industry,
+                    date_added=constituent.date_added,
+                    extracted_at=constituent.extracted_at,
+                    source_url=constituent.source_url
                 )
                 companies.append(company)
 
+            logger.info(f"Extracted {len(companies)} companies with full business metadata for {index_name}")
             return companies
 
         except Exception as e:

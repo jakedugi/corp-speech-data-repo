@@ -11,8 +11,8 @@ from typing import Any, Dict, Iterable, List, Mapping
 
 from bs4 import BeautifulSoup
 
-from ..config import IndexConfig, get_index_config
-from .base import ParserError, TableParser
+from corpus_hydrator.adapters.wikipedia_key_people.config import IndexConfig, get_index_config
+from .parsers.base import ParserError, TableParser
 
 logger = logging.getLogger(__name__)
 

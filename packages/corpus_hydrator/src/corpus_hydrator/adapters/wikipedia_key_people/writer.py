@@ -402,7 +402,7 @@ class WikipediaKeyPeopleWriter:
     # --------------------------------------------------------------------------- #
 
     def convert_legacy_to_normalized(
-        self, people: List[WikipediaKeyPerson], index_name: str = "unknown"
+        self, people: List[WikipediaKeyPerson], index_name: str = "unknown", companies: List = None
     ) -> tuple[
         List[NormalizedCompany],
         List[NormalizedPerson],
@@ -414,16 +414,36 @@ class WikipediaKeyPeopleWriter:
 
         This maintains backward compatibility while enabling the new structure.
         """
-        companies = {}
+        companies_dict = {}
         people_dict = {}
         roles = {}
         appointments = []
 
+        # If we have enhanced company data, use it to create companies_dict
+        if companies:
+            for company in companies:
+                company_id = f"{company.ticker}_{index_name}"
+                companies_dict[company_id] = NormalizedCompany(
+                    company_id=company_id,
+                    company_name=company.company_name,
+                    ticker=company.ticker,
+                    wikipedia_url=company.wikipedia_url,
+                    wikidata_qid=None,  # Could be extracted later
+                    index_name=company.index_name,
+                    sector=company.sector,
+                    industry=company.industry,
+                    date_added=company.date_added,
+                    extracted_at=company.extracted_at,
+                    source_url=company.source_url,
+                    processed_at=company.processed_at,
+                    source_revision_id=None,  # TODO: extract from URL or metadata
+                )
+
         for person in people:
-            # Create/update company
+            # Create/update company (only if not already created from company_list)
             company_id = f"{person.ticker}_{index_name}"
-            if company_id not in companies:
-                companies[company_id] = NormalizedCompany(
+            if company_id not in companies_dict:
+                companies_dict[company_id] = NormalizedCompany(
                     company_id=company_id,
                     company_name=person.company_name,
                     ticker=person.ticker,
@@ -461,7 +481,7 @@ class WikipediaKeyPeopleWriter:
             appointments.append(appointment)
 
         return (
-            list(companies.values()),
+            list(companies_dict.values()),
             list(people_dict.values()),
             list(roles.values()),
             appointments,

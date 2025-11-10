@@ -11,7 +11,7 @@ from typing import Dict, List
 
 from corpus_types.schemas.models import IndexExtractionResult
 
-from .config import get_index_config
+from corpus_hydrator.adapters.wikipedia_key_people.config import get_index_config
 from .normalize import normalize_rows
 from .parsers.base import ParserError, TableParser
 from .providers.base import IndexProvider, ProviderError
